@@ -1,0 +1,28 @@
+{
+  "root": "apps/transfers-e2e",
+  "sourceRoot": "apps/transfers-e2e/src",
+  "projectType": "application",
+  "targets": {
+    "e2e": {
+      "executor": "@nrwl/cypress:cypress",
+      "options": {
+        "cypressConfig": "apps/transfers-e2e/cypress.json",
+        "devServerTarget": "transfers:serve"
+      },
+      "configurations": {
+        "production": {
+          "devServerTarget": "transfers:serve:production"
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/transfers-e2e/**/*.{js,ts}"]
+      }
+    }
+  },
+  "tags": [],
+  "implicitDependencies": ["transfers"]
+}

@@ -1,0 +1,73 @@
+{
+  "root": "apps/transfers",
+  "sourceRoot": "apps/transfers/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/web:webpack",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "compiler": "babel",
+        "outputPath": "dist/apps/transfers",
+        "index": "apps/transfers/src/index.html",
+        "baseHref": "/",
+        "main": "apps/transfers/src/main.tsx",
+        "polyfills": "apps/transfers/src/polyfills.ts",
+        "tsConfig": "apps/transfers/tsconfig.app.json",
+        "assets": [
+          "apps/transfers/src/favicon.ico",
+          "apps/transfers/src/assets"
+        ],
+        "styles": ["apps/transfers/src/styles.scss"],
+        "scripts": [],
+        "webpackConfig": "@nrwl/react/plugins/webpack"
+      },
+      "configurations": {
+        "production": {
+          "fileReplacements": [
+            {
+              "replace": "apps/transfers/src/environments/environment.ts",
+              "with": "apps/transfers/src/environments/environment.prod.ts"
+            }
+          ],
+          "optimization": true,
+          "outputHashing": "all",
+          "sourceMap": false,
+          "namedChunks": false,
+          "extractLicenses": true,
+          "vendorChunk": false
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nrwl/web:dev-server",
+      "options": {
+        "buildTarget": "transfers:build",
+        "hmr": true
+      },
+      "configurations": {
+        "production": {
+          "buildTarget": "transfers:build:production",
+          "hmr": false
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/transfers/**/*.{ts,tsx,js,jsx}"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/apps/transfers"],
+      "options": {
+        "jestConfig": "apps/transfers/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}
