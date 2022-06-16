@@ -19,7 +19,7 @@
           "apps/transfers/src/favicon.ico",
           "apps/transfers/src/assets"
         ],
-        "styles": ["apps/transfers/src/styles.scss"],
+        "styles": ["apps/transfers/src/styles.css"],
         "scripts": [],
         "webpackConfig": "@nrwl/react/plugins/webpack"
       },
