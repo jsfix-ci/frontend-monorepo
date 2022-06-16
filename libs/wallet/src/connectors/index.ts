@@ -27,4 +27,7 @@ export interface VegaConnector {
   sendTx: (
     body: TransactionSubmission
   ) => Promise<TransactionResponse | ErrorResponse>;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  config: () => any;
 }

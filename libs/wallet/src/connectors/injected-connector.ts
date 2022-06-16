@@ -25,4 +25,8 @@ export class InjectedConnector implements VegaConnector {
   sendTx() {
     return Promise.resolve(null);
   }
+
+  config() {
+    return Promise.resolve(null);
+  }
 }

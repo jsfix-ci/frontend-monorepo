@@ -10,6 +10,7 @@ import {
   FormGroup,
   Input,
   InputError,
+  Loader,
   Select,
   ThemeSwitcher,
 } from '@vegaprotocol/ui-toolkit';
@@ -19,7 +20,7 @@ import {
   VegaWalletProvider,
 } from '@vegaprotocol/wallet';
 import { RestConnector } from '@vegaprotocol/wallet';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 export const rest = new RestConnector();
@@ -227,6 +228,41 @@ const TransfersForm = () => {
   );
 };
 
+const TransfersContainer = () => {
+  const { connector } = useVegaWallet();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/no-explicit-any
+  const [config, setConfig] = useState<any | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  useEffect(() => {
+    const run = async () => {
+      try {
+        setLoading(true);
+        const res = await connector?.config();
+        setConfig(res);
+      } catch (e) {
+        setError(e as Error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    run();
+  }, [connector]);
+  if (loading) {
+    return <Loader />;
+  } else if (error) {
+    return <div>{error.message}</div>;
+  }
+  return (
+    <section>
+      {/* TODO */}
+      {/* Connected to network: {config.name}
+      Using host config: {JSON.stringify(config.api.grpc)} */}
+      <TransfersForm />
+    </section>
+  );
+};
+
 const Transfers = ({
   setConnectModalShown,
 }: {
@@ -235,7 +271,7 @@ const Transfers = ({
   const { keypair } = useVegaWallet();
   const isConnected = useMemo(() => keypair !== null, [keypair]);
   return isConnected ? (
-    <TransfersForm />
+    <TransfersContainer />
   ) : (
     <Button onClick={() => setConnectModalShown(true)}>
       Connect Vega Wallet

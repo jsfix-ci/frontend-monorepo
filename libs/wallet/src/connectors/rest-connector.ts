@@ -73,6 +73,18 @@ export class RestConnector implements VegaConnector {
     }
   }
 
+  async config() {
+    try {
+      const res = await this.service.networkGet();
+      return res;
+    } catch (err) {
+      console.error(err);
+      // keysGet failed, its likely that the session has expired so remove the token from storage
+      this.clearConfig();
+      return null;
+    }
+  }
+
   async disconnect() {
     try {
       await this.service.authTokenDelete();
