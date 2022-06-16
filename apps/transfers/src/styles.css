@@ -4,4 +4,5 @@
 
 .vega-bg {
   background-image: url('./assets/vega-bg.png');
+  background-size: cover;
 }
