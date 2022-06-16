@@ -146,30 +146,6 @@ const TransfersForm = () => {
   }, []);
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <FormGroup
-        label={t('To account type:')}
-        labelFor="toAccountType"
-        className="relative"
-      >
-        <Select
-          {...register('toAccountType', { validate: { required } })}
-          id="asset"
-        >
-          <option value="">
-            {t('Please select (you probably want general)')}
-          </option>
-          {ACCOUNT_TYPES.map((a) => (
-            <option key={a.id} value={a.id}>
-              {a.type} ({a.description})
-            </option>
-          ))}
-        </Select>
-        {error?.message && (
-          <InputError intent="danger" className="mt-4" forInput="asset">
-            {error?.message}
-          </InputError>
-        )}
-      </FormGroup>
       <FormGroup label={t('Amount:')} labelFor="toAddress">
         <Input
           {...register('amount', { validate: { required } })}
@@ -190,7 +166,9 @@ const TransfersForm = () => {
           hasError={Boolean(error?.message)}
           type="text"
           autoFocus={true}
-          placeholder={t('To address e.g. ')}
+          placeholder={t(
+            'To address e.g. c443fb0388266c290736f325efeaad9aaa6d5f7f7b184f4e2302ecf8207b056e'
+          )}
         />
         {error?.message && (
           <InputError intent="danger">{error.message}</InputError>
@@ -220,7 +198,30 @@ const TransfersForm = () => {
           </InputError>
         )}
       </FormGroup>
-
+      <FormGroup
+        label={t('To account type:')}
+        labelFor="toAccountType"
+        className="relative"
+      >
+        <Select
+          {...register('toAccountType', { validate: { required } })}
+          id="asset"
+        >
+          <option value="">
+            {t('Please select (you probably want general)')}
+          </option>
+          {ACCOUNT_TYPES.map((a) => (
+            <option key={a.id} value={a.id}>
+              {a.type} ({a.description})
+            </option>
+          ))}
+        </Select>
+        {error?.message && (
+          <InputError intent="danger" className="mt-4" forInput="asset">
+            {error?.message}
+          </InputError>
+        )}
+      </FormGroup>
       <Button type="submit" variant="secondary">
         {t('Send')}
       </Button>
@@ -247,6 +248,22 @@ const TransfersContainer = () => {
       }
     };
     run();
+  }, [connector]);
+  useEffect(() => {
+    const run = async () => {
+      try {
+        const res = await connector?.config();
+        setConfig(res);
+      } catch (e) {
+        setError(e as Error);
+      }
+    };
+    const interval = setInterval(run, 10 * 1000);
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
   }, [connector]);
   if (loading) {
     return <Loader />;
