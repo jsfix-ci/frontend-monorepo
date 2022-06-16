@@ -13,6 +13,7 @@ const getCurrentTheme = () => {
     theme === darkTheme ||
     (!theme &&
       typeof window !== 'undefined' &&
+      typeof window.matchMedia === 'function' &&
       window.matchMedia('(prefers-color-scheme: dark)').matches)
   ) {
     return darkTheme;
