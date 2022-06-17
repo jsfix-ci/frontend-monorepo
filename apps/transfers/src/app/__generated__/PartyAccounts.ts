@@ -49,3 +49,7 @@ export interface PartyAccounts {
    */
   party: PartyAccounts_party | null;
 }
+
+export interface PartyAccountsVariables {
+  partyId: string;
+}
