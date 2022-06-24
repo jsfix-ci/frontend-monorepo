@@ -1,6 +1,7 @@
 import { ApolloProvider, gql, useQuery } from '@apollo/client';
 import {
   addDecimal,
+  formatNumber,
   maxSafe,
   removeDecimal,
   required,
@@ -9,6 +10,7 @@ import {
   useThemeSwitcher,
   vegaPublicKey,
 } from '@vegaprotocol/react-helpers';
+import { AccountType } from '@vegaprotocol/types';
 import {
   Button,
   FormGroup,
@@ -42,10 +44,7 @@ import type {
 - [ ] Use introspection query for account types
 - [ ] Pull GQL URL from wallet config
 - [ ] Wallet config types
-- [ ] Support people without a party
-- [ ] Only show assets with non-zero balances
 - [ ] Show asset balances
-- [ ] Handle case when there is more than one account of the selected asset
 - [ ] Show connected network and data node URL
 - [ ] User stories
 */
@@ -82,7 +81,9 @@ const ACCOUNTS_QUERY = gql`
           id
           name
           decimals
+          symbol
         }
+        type
         balance
       }
     }
@@ -134,54 +135,68 @@ const TransfersForm = ({
     [account.asset.decimals, account.balance]
   );
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <FormGroup label={t('Amount:')} labelFor="toAddress" className="relative">
-        <Input
-          {...register('amount', {
-            validate: {
-              required,
-              maxSafe: (value) => maxSafe(new BigNumber(max))(value),
-            },
-          })}
-          id="amount"
-          hasError={Boolean(errors.amount?.message)}
-          type="number"
-          autoFocus={true}
-          placeholder={t('10')}
-        />
-        {errors.amount?.message && (
-          <InputError intent="danger">{errors.amount?.message}</InputError>
-        )}
-        <UseButton
-          onClick={() => {
-            setValue('amount', max);
-          }}
-        >
-          {t('Use maximum')}
-        </UseButton>
-      </FormGroup>
-      <FormGroup label={t('To (Vega Address):')} labelFor="toAddress">
-        <Input
-          {...register('toAddress', { validate: { required, vegaPublicKey } })}
-          id="toAddress"
-          hasError={Boolean(errors.toAddress?.message)}
-          type="text"
-          autoFocus={true}
-          placeholder={t(
-            'To address e.g. c443fb0388266c290736f325efeaad9aaa6d5f7f7b184f4e2302ecf8207b056e'
-          )}
-        />
-        {errors.toAddress?.message && (
-          <InputError intent="danger">{errors.toAddress?.message}</InputError>
-        )}
-      </FormGroup>
-      <div className="text-center">
-        <Button type="submit" variant="secondary">
-          {t('Send')}
-        </Button>
+    <>
+      <div className="flex flex-1 justify-between mb-16">
+        <div>Balance:</div>
+        <div>
+          {max} {account.asset.symbol}
+        </div>
       </div>
-      <div>{JSON.stringify(transaction)}</div>
-    </form>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <FormGroup
+          label={t('Amount:')}
+          labelFor="toAddress"
+          className="relative"
+        >
+          <Input
+            {...register('amount', {
+              validate: {
+                required,
+                maxSafe: (value) => maxSafe(new BigNumber(max))(value),
+              },
+            })}
+            id="amount"
+            hasError={Boolean(errors.amount?.message)}
+            type="number"
+            autoFocus={true}
+            placeholder={t('10')}
+          />
+          {errors.amount?.message && (
+            <InputError intent="danger">{errors.amount?.message}</InputError>
+          )}
+          <UseButton
+            onClick={() => {
+              setValue('amount', max);
+            }}
+          >
+            {t('Use maximum')}
+          </UseButton>
+        </FormGroup>
+        <FormGroup label={t('To (Vega Address):')} labelFor="toAddress">
+          <Input
+            {...register('toAddress', {
+              validate: { required, vegaPublicKey },
+            })}
+            id="toAddress"
+            hasError={Boolean(errors.toAddress?.message)}
+            type="text"
+            autoFocus={true}
+            placeholder={t(
+              'To address e.g. c443fb0388266c290736f325efeaad9aaa6d5f7f7b184f4e2302ecf8207b056e'
+            )}
+          />
+          {errors.toAddress?.message && (
+            <InputError intent="danger">{errors.toAddress?.message}</InputError>
+          )}
+        </FormGroup>
+        <div className="text-center">
+          <Button type="submit" variant="secondary">
+            {t('Send')}
+          </Button>
+        </div>
+        <div>{JSON.stringify(transaction)}</div>
+      </form>
+    </>
   );
 };
 
@@ -231,12 +246,19 @@ const TransfersContainer = ({ keypair }: { keypair: VegaKeyExtended }) => {
       }
     };
   }, [connector]);
+
   if (loading || accountsLoading) {
     return <Loader />;
   } else if (error || accountsError) {
     return <div>{error?.message || accountsError?.message}</div>;
+  } else if (data?.party?.accounts?.length === 0) {
+    return (
+      // eslint-disable-next-line jsx-a11y/accessible-emoji
+      <div>
+        You don't have any assets with a general account balance above 0 😢
+      </div>
+    );
   }
-  // TODO add empty state for if party does not exist or party has no money
   return (
     <section>
       {/* TODO */}
@@ -248,18 +270,24 @@ const TransfersContainer = ({ keypair }: { keypair: VegaKeyExtended }) => {
           value={account?.asset.id}
           onChange={(e) =>
             setAsset(
-              data?.party?.accounts?.find((a) => a.asset.id === e.target.value)
+              data?.party?.accounts?.find(
+                (a) =>
+                  a.asset.id === e.target.value &&
+                  a.type === AccountType.General
+              )
             )
           }
         >
           <option value={undefined}>{t('Please select an asset')}</option>
-          {data?.party?.accounts?.map((d) => {
-            return (
-              <option value={d.asset.id} key={d.asset.name}>
-                {d.asset.name}
-              </option>
-            );
-          })}
+          {data?.party?.accounts
+            ?.filter((a) => a.type === AccountType.General)
+            .map((d) => {
+              return (
+                <option value={d.asset.id} key={d.asset.name}>
+                  {d.asset.name} ({d.asset.symbol}){' '}
+                </option>
+              );
+            })}
         </Select>
       </FormGroup>
       {account && <TransfersForm account={account} />}
@@ -272,7 +300,9 @@ const Transfers = ({
 }: {
   setConnectModalShown: (value: boolean) => void;
 }) => {
-  const { keypair } = useVegaWallet();
+  const { keypair, keypairs } = useVegaWallet();
+
+  console.log(keypair, keypairs);
   return keypair !== null ? (
     <TransfersContainer keypair={keypair} />
   ) : (
@@ -298,7 +328,7 @@ export function App() {
       <ThemeContext.Provider value={theme}>
         <ApolloProvider client={client}>
           <VegaWalletProvider>
-            <section className="pt-32 border-x-1 px-64 w-[400px] dark:bg-black bg-white text-black dark:text-white ">
+            <section className="pt-32 border-x-1 px-64 w-[450px] dark:bg-black bg-white text-black dark:text-white ">
               <div className="flex justify-center mb-16">
                 <h1 className="uppercase calt mr-8 font-alpha text-h3">
                   {t('Transfers')}

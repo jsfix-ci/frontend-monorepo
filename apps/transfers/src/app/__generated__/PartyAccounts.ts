@@ -3,6 +3,8 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
+import { AccountType } from "@vegaprotocol/types";
+
 // ====================================================
 // GraphQL query operation: PartyAccounts
 // ====================================================
@@ -21,6 +23,10 @@ export interface PartyAccounts_party_accounts_asset {
    * The precision of the asset
    */
   decimals: number;
+  /**
+   * The symbol of the asset (e.g: GBP)
+   */
+  symbol: string;
 }
 
 export interface PartyAccounts_party_accounts {
@@ -29,6 +35,10 @@ export interface PartyAccounts_party_accounts {
    * Asset, the 'currency'
    */
   asset: PartyAccounts_party_accounts_asset;
+  /**
+   * Account type (General, Margin, etc)
+   */
+  type: AccountType;
   /**
    * Balance as string - current account balance (approx. as balances can be updated several times per second)
    */
