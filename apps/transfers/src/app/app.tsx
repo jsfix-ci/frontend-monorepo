@@ -247,11 +247,16 @@ const TransfersContainer = ({ keypair }: { keypair: VegaKeyExtended }) => {
     };
   }, [connector]);
 
+  const accounts = useMemo(
+    () => data?.party?.accounts?.filter((a) => a.type === AccountType.General),
+    [data?.party?.accounts]
+  );
+
   if (loading || accountsLoading) {
     return <Loader />;
   } else if (error || accountsError) {
     return <div>{error?.message || accountsError?.message}</div>;
-  } else if (data?.party?.accounts?.length === 0) {
+  } else if (accounts?.length === 0) {
     return (
       // eslint-disable-next-line jsx-a11y/accessible-emoji
       <div>
@@ -269,25 +274,17 @@ const TransfersContainer = ({ keypair }: { keypair: VegaKeyExtended }) => {
         <Select
           value={account?.asset.id}
           onChange={(e) =>
-            setAsset(
-              data?.party?.accounts?.find(
-                (a) =>
-                  a.asset.id === e.target.value &&
-                  a.type === AccountType.General
-              )
-            )
+            setAsset(accounts?.find((a) => a.asset.id === e.target.value))
           }
         >
           <option value={undefined}>{t('Please select an asset')}</option>
-          {data?.party?.accounts
-            ?.filter((a) => a.type === AccountType.General)
-            .map((d) => {
-              return (
-                <option value={d.asset.id} key={d.asset.name}>
-                  {d.asset.name} ({d.asset.symbol}){' '}
-                </option>
-              );
-            })}
+          {accounts?.map((d) => {
+            return (
+              <option value={d.asset.id} key={d.asset.name}>
+                {d.asset.name} ({d.asset.symbol}){' '}
+              </option>
+            );
+          })}
         </Select>
       </FormGroup>
       {account && <TransfersForm account={account} />}
