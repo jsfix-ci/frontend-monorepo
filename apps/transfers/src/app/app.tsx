@@ -7,6 +7,7 @@ import {
   required,
   t,
   ThemeContext,
+  truncateByChars,
   useThemeSwitcher,
   vegaPublicKey,
 } from '@vegaprotocol/react-helpers';
@@ -20,7 +21,7 @@ import {
   Select,
   ThemeSwitcher,
 } from '@vegaprotocol/ui-toolkit';
-import type { VegaKeyExtended } from '@vegaprotocol/wallet';
+import { VegaKeyExtended, VegaManageDialog } from '@vegaprotocol/wallet';
 import {
   useVegaTransaction,
   useVegaWallet,
@@ -256,7 +257,7 @@ const TransfersContainer = ({ keypair }: { keypair: VegaKeyExtended }) => {
     return <Loader />;
   } else if (error || accountsError) {
     return <div>{error?.message || accountsError?.message}</div>;
-  } else if (accounts?.length === 0) {
+  } else if (!accounts || accounts.length === 0) {
     return (
       // eslint-disable-next-line jsx-a11y/accessible-emoji
       <div>
@@ -294,14 +295,20 @@ const TransfersContainer = ({ keypair }: { keypair: VegaKeyExtended }) => {
 
 const Transfers = ({
   setConnectModalShown,
+  setManageModalShown,
 }: {
   setConnectModalShown: (value: boolean) => void;
+  setManageModalShown: (value: boolean) => void;
 }) => {
   const { keypair, keypairs } = useVegaWallet();
 
   console.log(keypair, keypairs);
   return keypair !== null ? (
-    <TransfersContainer keypair={keypair} />
+    <>
+      <div>Connected key: {truncateByChars(keypair.pub)}</div>
+      <Button onClick={() => setManageModalShown(true)}>Change key</Button>
+      <TransfersContainer keypair={keypair} />
+    </>
   ) : (
     <div className="text-center">
       <Button onClick={() => setConnectModalShown(true)}>
@@ -312,7 +319,8 @@ const Transfers = ({
 };
 
 export function App() {
-  const [dialogOpen, setDialogOpen] = useState(true);
+  const [connectDialogOpen, setConnectDialogOpen] = useState(true);
+  const [manageKeysDialogOpen, setManageKeysDialogOpen] = useState(false);
   const [theme, toggleTheme] = useThemeSwitcher();
   // TODO this should be pulled from wallet config, but need to publish wallet config lib first
   const client = useMemo(
@@ -332,11 +340,18 @@ export function App() {
                 </h1>
                 <ThemeSwitcher onToggle={toggleTheme} className="-my-4" />
               </div>
-              <Transfers setConnectModalShown={setDialogOpen} />
+              <Transfers
+                setConnectModalShown={setConnectDialogOpen}
+                setManageModalShown={setManageKeysDialogOpen}
+              />
               <VegaConnectDialog
                 connectors={Connectors}
-                dialogOpen={dialogOpen}
-                setDialogOpen={setDialogOpen}
+                dialogOpen={connectDialogOpen}
+                setDialogOpen={setConnectDialogOpen}
+              />
+              <VegaManageDialog
+                dialogOpen={manageKeysDialogOpen}
+                setDialogOpen={setManageKeysDialogOpen}
               />
             </section>
           </VegaWalletProvider>
