@@ -1,7 +1,6 @@
 import { ApolloProvider, gql, useQuery } from '@apollo/client';
 import {
   addDecimal,
-  formatNumber,
   maxSafe,
   removeDecimal,
   required,
@@ -21,7 +20,8 @@ import {
   Select,
   ThemeSwitcher,
 } from '@vegaprotocol/ui-toolkit';
-import { VegaKeyExtended, VegaManageDialog } from '@vegaprotocol/wallet';
+import type { VegaKeyExtended } from '@vegaprotocol/wallet';
+import { VegaManageDialog } from '@vegaprotocol/wallet';
 import {
   useVegaTransaction,
   useVegaWallet,
