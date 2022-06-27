@@ -2,6 +2,7 @@ import type {
   VegaKey,
   TransactionResponse,
 } from '@vegaprotocol/vegawallet-service-api-client';
+import type { NetworkConfig } from '@vegaprotocol/vegawallet-service-api-client/dist/models/NetworkConfig';
 import type { TransactionSubmission } from '../types';
 export { RestConnector } from './rest-connector';
 
@@ -28,6 +29,5 @@ export interface VegaConnector {
     body: TransactionSubmission
   ) => Promise<TransactionResponse | ErrorResponse>;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  config: () => any;
+  config: () => Promise<NetworkConfig | null>;
 }

@@ -76,10 +76,10 @@ export class RestConnector implements VegaConnector {
   async config() {
     try {
       const res = await this.service.networkGet();
-      return res;
+      return res.network;
     } catch (err) {
       console.error(err);
-      // keysGet failed, its likely that the session has expired so remove the token from storage
+      // networkGet failed, its likely that the session has expired so remove the token from storage
       this.clearConfig();
       return null;
     }
@@ -99,6 +99,8 @@ export class RestConnector implements VegaConnector {
 
   async sendTx(body: TransactionSubmission) {
     try {
+      // TODO
+      // @ts-ignore types for command sync are not generated right
       return await this.service.commandSyncPost(body);
     } catch (err) {
       return this.handleSendTxError(err);

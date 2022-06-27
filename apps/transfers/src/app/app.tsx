@@ -20,6 +20,7 @@ import {
   Select,
   ThemeSwitcher,
 } from '@vegaprotocol/ui-toolkit';
+import type { NetworkConfig } from '@vegaprotocol/vegawallet-service-api-client/dist/models/NetworkConfig';
 import type { VegaKeyExtended } from '@vegaprotocol/wallet';
 import { VegaManageDialog } from '@vegaprotocol/wallet';
 import {
@@ -30,8 +31,9 @@ import {
 } from '@vegaprotocol/wallet';
 import { RestConnector } from '@vegaprotocol/wallet';
 import BigNumber from 'bignumber.js';
+import isEqual from 'lodash/isEqual';
 import type { ReactNode } from 'react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { createClient } from '../lib/apollo-client';
 import type {
@@ -41,12 +43,6 @@ import type {
 } from './__generated__/PartyAccounts';
 
 /*
-- [ ] Support multilpe keys
-- [ ] Use introspection query for account types
-- [ ] Pull GQL URL from wallet config
-- [ ] Wallet config types
-- [ ] Show asset balances
-- [ ] Show connected network and data node URL
 - [ ] User stories
 */
 
@@ -127,7 +123,6 @@ const TransfersForm = ({
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       send(transactionData);
-      console.log('send', transactionData);
     },
     [account.asset.decimals, account.asset.id, keypair?.pub, send]
   );
@@ -201,12 +196,13 @@ const TransfersForm = ({
   );
 };
 
-const TransfersContainer = ({ keypair }: { keypair: VegaKeyExtended }) => {
-  const { connector } = useVegaWallet();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/no-explicit-any
-  const [config, setConfig] = useState<any | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+const TransfersContainer = ({
+  keypair,
+  config,
+}: {
+  keypair: VegaKeyExtended;
+  config: NetworkConfig;
+}) => {
   const [account, setAsset] = useState<
     PartyAccounts_party_accounts | undefined
   >(undefined);
@@ -217,60 +213,33 @@ const TransfersContainer = ({ keypair }: { keypair: VegaKeyExtended }) => {
   } = useQuery<PartyAccounts, PartyAccountsVariables>(ACCOUNTS_QUERY, {
     variables: { partyId: keypair.pub || '' },
   });
-  useEffect(() => {
-    const run = async () => {
-      try {
-        setLoading(true);
-        const res = await connector?.config();
-        setConfig(res);
-      } catch (e) {
-        setError(e as Error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    run();
-  }, [connector]);
-  useEffect(() => {
-    const run = async () => {
-      try {
-        const res = await connector?.config();
-        setConfig(res);
-      } catch (e) {
-        setError(e as Error);
-      }
-    };
-    const interval = setInterval(run, 10 * 1000);
-    return () => {
-      if (interval) {
-        clearInterval(interval);
-      }
-    };
-  }, [connector]);
-
   const accounts = useMemo(
     () => data?.party?.accounts?.filter((a) => a.type === AccountType.General),
     [data?.party?.accounts]
   );
 
-  if (loading || accountsLoading) {
+  if (accountsLoading) {
     return <Loader />;
-  } else if (error || accountsError) {
-    return <div>{error?.message || accountsError?.message}</div>;
+  } else if (accountsError) {
+    return <div>{accountsError?.message}</div>;
   } else if (!accounts || accounts.length === 0) {
     return (
       // eslint-disable-next-line jsx-a11y/accessible-emoji
-      <div>
+      <div className="mt-8">
         You don't have any assets with a general account balance above 0 😢
       </div>
     );
   }
   return (
     <section>
-      {/* TODO */}
-      {/* Connected to network: {config.name}
-      Using host config: {JSON.stringify(config.api.grpc)}
-      Using data node: {JSON.stringify(config.api.graphQl)} */}
+      <div className="my-8">
+        <div>Connected key: {truncateByChars(keypair.pub)}</div>
+        <div>Connected to network: {config.name}</div>
+        <div>
+          Using data node:{' '}
+          {config.api?.graphQl?.hosts && config.api?.graphQl?.hosts[0]}
+        </div>
+      </div>
       <FormGroup label={t('Asset:')} labelFor="asset" className="relative">
         <Select
           value={account?.asset.id}
@@ -293,6 +262,78 @@ const TransfersContainer = ({ keypair }: { keypair: VegaKeyExtended }) => {
   );
 };
 
+const usePollForConfig = () => {
+  const { connector } = useVegaWallet();
+  const [config, setConfig] = useState<NetworkConfig | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  useEffect(() => {
+    const run = async () => {
+      try {
+        setLoading(true);
+        const res = await connector?.config();
+        if (res) {
+          setConfig(res);
+        }
+      } catch (e) {
+        setError(e as Error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    run();
+  }, [connector]);
+  useEffect(() => {
+    const run = async () => {
+      try {
+        const res = await connector?.config();
+        if (res && !isEqual(res, config)) {
+          setConfig(res);
+        }
+      } catch (e) {
+        setError(e as Error);
+      }
+    };
+    const interval = setInterval(run, 1000 * 10);
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
+  }, [config, connector]);
+  return {
+    config,
+    error,
+    loading,
+  };
+};
+
+const ConfigContainer = ({
+  render,
+}: {
+  render: (config: NetworkConfig) => JSX.Element;
+}) => {
+  const { loading, error, config } = usePollForConfig();
+  const client = useMemo(() => {
+    if (config?.api?.graphQl?.hosts && config.api.graphQl.hosts[0]) {
+      return createClient(config.api.graphQl.hosts[0]);
+    }
+    return;
+  }, [config?.api?.graphQl?.hosts]);
+  if (loading || !config || !client) {
+    return <Loader />;
+  } else if (error) {
+    return <div>{error?.message}</div>;
+  } else if (
+    !config.api?.graphQl?.hosts ||
+    config.api?.graphQl?.hosts.length === 0
+  ) {
+    // eslint-disable-next-line jsx-a11y/accessible-emoji
+    return <div className="mt-8">No data node config found ion wallet😢</div>;
+  }
+  return <ApolloProvider client={client}>{render(config)}</ApolloProvider>;
+};
+
 const Transfers = ({
   setConnectModalShown,
   setManageModalShown,
@@ -305,9 +346,12 @@ const Transfers = ({
   console.log(keypair, keypairs);
   return keypair !== null ? (
     <>
-      <div>Connected key: {truncateByChars(keypair.pub)}</div>
       <Button onClick={() => setManageModalShown(true)}>Change key</Button>
-      <TransfersContainer keypair={keypair} />
+      <ConfigContainer
+        render={(config) => (
+          <TransfersContainer keypair={keypair} config={config} />
+        )}
+      />
     </>
   ) : (
     <div className="text-center">
@@ -322,40 +366,33 @@ export function App() {
   const [connectDialogOpen, setConnectDialogOpen] = useState(true);
   const [manageKeysDialogOpen, setManageKeysDialogOpen] = useState(false);
   const [theme, toggleTheme] = useThemeSwitcher();
-  // TODO this should be pulled from wallet config, but need to publish wallet config lib first
-  const client = useMemo(
-    () => createClient('https://lb.testnet.vega.xyz/query'),
-    []
-  );
 
   return (
     <div className="antialiased m-0 h-full flex justify-center vega-bg">
       <ThemeContext.Provider value={theme}>
-        <ApolloProvider client={client}>
-          <VegaWalletProvider>
-            <section className="pt-32 border-x-1 px-64 w-[450px] dark:bg-black bg-white text-black dark:text-white ">
-              <div className="flex justify-center mb-16">
-                <h1 className="uppercase calt mr-8 font-alpha text-h3">
-                  {t('Transfers')}
-                </h1>
-                <ThemeSwitcher onToggle={toggleTheme} className="-my-4" />
-              </div>
-              <Transfers
-                setConnectModalShown={setConnectDialogOpen}
-                setManageModalShown={setManageKeysDialogOpen}
-              />
-              <VegaConnectDialog
-                connectors={Connectors}
-                dialogOpen={connectDialogOpen}
-                setDialogOpen={setConnectDialogOpen}
-              />
-              <VegaManageDialog
-                dialogOpen={manageKeysDialogOpen}
-                setDialogOpen={setManageKeysDialogOpen}
-              />
-            </section>
-          </VegaWalletProvider>
-        </ApolloProvider>
+        <VegaWalletProvider>
+          <section className="pt-32 border-x-1 px-64 w-[450px] dark:bg-black bg-white text-black dark:text-white ">
+            <div className="flex justify-center mb-16">
+              <h1 className="uppercase calt mr-8 font-alpha text-h3">
+                {t('Transfers')}
+              </h1>
+              <ThemeSwitcher onToggle={toggleTheme} className="-my-4" />
+            </div>
+            <Transfers
+              setConnectModalShown={setConnectDialogOpen}
+              setManageModalShown={setManageKeysDialogOpen}
+            />
+            <VegaConnectDialog
+              connectors={Connectors}
+              dialogOpen={connectDialogOpen}
+              setDialogOpen={setConnectDialogOpen}
+            />
+            <VegaManageDialog
+              dialogOpen={manageKeysDialogOpen}
+              setDialogOpen={setManageKeysDialogOpen}
+            />
+          </section>
+        </VegaWalletProvider>
       </ThemeContext.Provider>
     </div>
   );
