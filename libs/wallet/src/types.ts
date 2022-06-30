@@ -5,6 +5,7 @@ import type {
   VoteSubmissionBody,
   WithdrawSubmissionBody,
   OrderCancellationBody,
+  TransferSubmissionBody,
 } from '@vegaprotocol/vegawallet-service-api-client';
 
 export enum OrderType {
@@ -33,4 +34,5 @@ export type TransactionSubmission =
   | VoteSubmissionBody
   | DelegateSubmissionBody
   | UndelegateSubmissionBody
-  | OrderCancellationBody;
+  | OrderCancellationBody
+  | TransferSubmissionBody;

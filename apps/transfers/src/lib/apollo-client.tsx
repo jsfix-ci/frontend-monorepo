@@ -12,20 +12,7 @@ export function createClient(base?: string) {
   // Replace http with ws, preserving if its a secure connection eg. https => wss
   urlWS.protocol = urlWS.protocol.replace('http', 'ws');
 
-  const cache = new InMemoryCache({
-    typePolicies: {
-      Query: {},
-      Account: {
-        keyFields: false,
-        fields: {
-          balanceFormatted: {},
-        },
-      },
-      Node: {
-        keyFields: false,
-      },
-    },
-  });
+  const cache = new InMemoryCache();
 
   const retryLink = new RetryLink({
     delay: {

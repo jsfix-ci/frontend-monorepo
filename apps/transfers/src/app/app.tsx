@@ -94,11 +94,12 @@ interface FormFields {
 
 const TransfersForm = ({
   account,
+  pubKey,
 }: {
   account: PartyAccounts_party_accounts;
+  pubKey: string;
 }) => {
   const { send, transaction } = useVegaTransaction();
-  const { keypair } = useVegaWallet();
 
   const {
     register,
@@ -108,8 +109,8 @@ const TransfersForm = ({
   } = useForm<FormFields>();
   const onSubmit = useCallback(
     (fields: FormFields) => {
-      const transactionData = {
-        pubKey: keypair?.pub,
+      send({
+        pubKey: pubKey,
         propagate: true,
         transfer: {
           fromAccountType: 'ACCOUNT_TYPE_GENERAL',
@@ -119,12 +120,9 @@ const TransfersForm = ({
           amount: removeDecimal(fields.amount, account.asset.decimals),
           oneOff: { deliverOn: 0 },
         },
-      };
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      send(transactionData);
+      });
     },
-    [account.asset.decimals, account.asset.id, keypair?.pub, send]
+    [account.asset.decimals, account.asset.id, pubKey, send]
   );
   const max = useMemo(
     () => addDecimal(account.balance, account.asset.decimals).toString(),
@@ -257,7 +255,7 @@ const TransfersContainer = ({
           })}
         </Select>
       </FormGroup>
-      {account && <TransfersForm account={account} />}
+      {account && <TransfersForm account={account} pubKey={keypair.pub} />}
     </section>
   );
 };
