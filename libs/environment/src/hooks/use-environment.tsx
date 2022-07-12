@@ -28,10 +28,17 @@ export const EnvironmentProvider = ({
   const [environment, updateEnvironment] = useState<Environment>(
     compileEnvironment(definitions)
   );
-  const { config } = useConfig(environment, updateEnvironment, (errorType) => {
-    setNetworkError(errorType);
-    setNodeSwitcherOpen(true);
-  });
+  const { config } = useConfig(
+    environment,
+    (env: Partial<Environment>) => {
+      updateEnvironment((curr) => ({ ...curr, ...env }));
+    },
+    (errorType) => {
+      setNetworkError(errorType);
+      setNodeSwitcherOpen(true);
+    }
+  );
+  console.log('config', config);
 
   const errorMessage = validateEnvironment(environment);
 

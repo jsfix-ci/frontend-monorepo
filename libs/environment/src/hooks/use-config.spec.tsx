@@ -2,15 +2,21 @@ import { act, renderHook } from '@testing-library/react-hooks';
 import type { EnvironmentWithOptionalUrl } from './use-config';
 import { useConfig, LOCAL_STORAGE_NETWORK_KEY } from './use-config';
 import createClient from '../utils/apollo-client';
-import createMockClient, { MockRequestConfig } from './mocks/apollo-client';
+import type { MockRequestConfig } from './mocks/apollo-client';
+import createMockClient from './mocks/apollo-client';
 import { Networks } from '../types';
+import * as requestNodeModule from '../utils/request-node';
 
+jest.mock('../utils/request-node');
 jest.mock('../utils/apollo-client');
 
-type HostMapping = Record<string, {
-  query?: MockRequestConfig,
-  subscription?: MockRequestConfig,
-}>;
+type HostMapping = Record<
+  string,
+  {
+    query?: MockRequestConfig;
+    subscription?: MockRequestConfig;
+  }
+>;
 
 const mockHostMap: HostMapping = {
   'https://host1.com': {
@@ -36,10 +42,11 @@ const mockHostMap: HostMapping = {
 };
 
 const getQuickestHost = (hostMap: HostMapping) => {
-  return Object.keys(hostMap).sort((host1, host2) =>
-    (hostMap[host1].query?.delay ?? 0) - (hostMap[host2].query?.delay ?? 0)
+  return Object.keys(hostMap).sort(
+    (host1, host2) =>
+      (hostMap[host1].query?.delay ?? 0) - (hostMap[host2].query?.delay ?? 0)
   )[0];
-}
+};
 
 const mockEnvironment: EnvironmentWithOptionalUrl = {
   VEGA_ENV: Networks.TESTNET,
@@ -91,22 +98,18 @@ beforeEach(() => {
   );
 
   // @ts-ignore allow adding a mock return value to mocked module
-  createClient.mockImplementation(baseUrl => createMockClient({
-    ...mockHostMap[baseUrl],
-    network: mockEnvironment.VEGA_ENV,
-  }));
+  // createClient.mockImplementation((baseUrl) =>
+  //   createMockClient({
+  //     ...mockHostMap[baseUrl],
+  //     network: mockEnvironment.VEGA_ENV,
+  //   })
+  // );
 });
 
 afterAll(() => {
   // @ts-ignore: typescript doesn't recognise the mocked fetch instance
   fetch.mockRestore();
 });
-
-const flushPromises = async () => {
-  for (let i = 100; i > 0; i--) { // Hope this arbitrary number is enough!
-    await null;
-  }
-};
 
 describe('useConfig hook', () => {
   it('sets config for environment with VEGA_URL', async () => {
@@ -125,30 +128,36 @@ describe('useConfig hook', () => {
     expect(onError).not.toHaveBeenCalled();
   });
 
-  it.only('sets config for environment without VEGA_URL and updates environment with the node completing validation first', async () => {
+  it('sets config for environment without VEGA_URL and updates environment with the node completing validation first', async () => {
+    jest
+      .spyOn(requestNodeModule, 'requestNode')
+      .mockImplementation((url: any, callbacks: any) => {
+        callbacks.onStatsSuccess({
+          statistics: { chainId: 'testnet-43f9ed', blockHeight: '100' },
+        });
+        callbacks.onSubscriptionSuccess();
+        return createClient(url);
+      });
+
     const mockEnvWithUrl = {
       ...mockEnvironment,
       VEGA_URL: undefined,
     };
-    const { result, waitFor } = renderHook(() =>
+    const { result, waitForNextUpdate } = renderHook(() =>
       useConfig(mockEnvWithUrl, onUpdate, onError)
     );
 
-    act(() => {
-      jest.runAllTimers();
-    })
+    await waitForNextUpdate();
 
-
-    await flushPromises();
-
-    await waitFor(() => {
-      expect(result.current.config).toEqual({ hosts: Object.keys(mockHostMap) });
-      expect(onUpdate).toHaveBeenCalledWith({
-        ...mockEnvironment,
-        VEGA_URL: getQuickestHost(mockHostMap),
-      });
-      expect(onError).not.toHaveBeenCalled();
+    expect(result.current.config).toEqual({
+      hosts: Object.keys(mockHostMap),
     });
+    expect(onUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        VEGA_URL: 'https://host1.com',
+      })
+    );
+    expect(onError).not.toHaveBeenCalled();
   });
 
   it('returns an unset config when no config url is provided', async () => {
