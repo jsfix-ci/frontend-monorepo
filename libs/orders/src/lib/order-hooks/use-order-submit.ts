@@ -10,7 +10,6 @@ import type {
 import { VegaWalletOrderType, useVegaWallet } from '@vegaprotocol/wallet';
 import { determineId, removeDecimal } from '@vegaprotocol/react-helpers';
 import { useVegaTransaction } from '@vegaprotocol/wallet';
-import { MarketState } from '@vegaprotocol/types';
 import type { Market } from '../market';
 import type { Subscription } from 'zen-observable-ts';
 
@@ -70,12 +69,11 @@ export const useOrderSubmit = (market: Market) => {
 
   const submit = useCallback(
     async (order: Order) => {
-      if (!keypair || !order.side || market.state !== MarketState.Active) {
+      if (!keypair || !order.side) {
         return;
       }
 
       setFinalizedOrder(null);
-
       const res = await send({
         pubKey: keypair.pub,
         propagate: true,
