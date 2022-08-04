@@ -35,7 +35,7 @@
       "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/libs/react-helpers"],
       "options": {
-        "jestConfig": "libs/react-helpers/jest.config.js",
+        "jestConfig": "libs/react-helpers/jest.config.ts",
         "passWithNoTests": true
       }
     }

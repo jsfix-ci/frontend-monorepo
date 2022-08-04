@@ -1,10 +1,11 @@
+/* eslint-disable */
 module.exports = {
-  displayName: 'web3',
+  displayName: 'ui-toolkit',
   preset: '../../jest.preset.js',
   transform: {
     '^.+\\.[tj]sx?$': 'babel-jest',
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  coverageDirectory: '../../coverage/libs/web3',
+  coverageDirectory: '../../coverage/libs/ui-toolkit',
   setupFilesAfterEnv: ['./src/setup-tests.ts'],
 };

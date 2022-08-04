@@ -35,7 +35,7 @@
       "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/libs/deal-ticket"],
       "options": {
-        "jestConfig": "libs/deal-ticket/jest.config.js",
+        "jestConfig": "libs/deal-ticket/jest.config.ts",
         "passWithNoTests": true
       }
     }

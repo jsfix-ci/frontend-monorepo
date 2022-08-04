@@ -35,7 +35,7 @@
       "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/libs/deposits"],
       "options": {
-        "jestConfig": "libs/deposits/jest.config.js",
+        "jestConfig": "libs/deposits/jest.config.ts",
         "passWithNoTests": true
       }
     }

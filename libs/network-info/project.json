@@ -35,7 +35,7 @@
       "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/libs/network-info"],
       "options": {
-        "jestConfig": "libs/network-info/jest.config.js",
+        "jestConfig": "libs/network-info/jest.config.ts",
         "passWithNoTests": true
       }
     }

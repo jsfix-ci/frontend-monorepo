@@ -35,7 +35,7 @@
       "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/libs/accounts"],
       "options": {
-        "jestConfig": "libs/accounts/jest.config.js",
+        "jestConfig": "libs/accounts/jest.config.ts",
         "passWithNoTests": true
       }
     }
