@@ -14,16 +14,15 @@ Cypress.Commands.add('vega_wallet_import', () => {
   cy.exec(
     `vegawallet service run --network DV --automatic-consent  --home ${vegaWalletLocation}`
   );
-  cy.exec(
-    `vegawallet version`
-  );
+  cy.exec(`vegawallet version`);
 });
 
 Cypress.Commands.add('vega_wallet_send_tokens_to_reward_pool', (amount) => {
-  cy.highlight(`Sending Vega from Vega Wallet to reward Pool amount: ${amount}`);
-  
-  // cy.ensure_specified_unstaked_tokens_are_associated(50000);
+  cy.highlight(
+    `Sending Vega from Vega Wallet to reward Pool amount: ${amount}`
+  );
 
+  // cy.ensure_specified_unstaked_tokens_are_associated(50000);
 
   cy.exec(
     `vegawallet command send --wallet capsule_wallet --pubkey 02eceaba4df2bef76ea10caf728d8a099a2aa846cced25737cccaa9812342f65 -p ./src/fixtures/wallet/passphrase --network DV '{
@@ -37,8 +36,9 @@ Cypress.Commands.add('vega_wallet_send_tokens_to_reward_pool', (amount) => {
             "deliverOn": 0
         }
     }
-  }'`);
-})
+  }'`
+  );
+});
 
 Cypress.Commands.add('vega_wallet_connect', () => {
   cy.highlight('Connecting Vega Wallet');

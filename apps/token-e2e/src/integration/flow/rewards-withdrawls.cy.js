@@ -45,18 +45,23 @@ context('Rewards Tab - with eth and vega wallets connected', function () {
     // cy.vega_wallet_send_tokens_to_reward_pool('500000000000000000000').wait(5000)
 
     cy.get_global_reward_pool_info().then((rewards) => {
-      cy.log(rewards['Vega'].balance)
-        // cy.wrap(parseInt(rewards['Vega'])).as('vega_reward_pool_balance');
-    })
-    cy.pause()
+      cy.log(rewards['Vega'].balance);
+      // cy.wrap(parseInt(rewards['Vega'])).as('vega_reward_pool_balance');
+    });
+    cy.pause();
   });
 
   describe('Eth wallet - contains VEGA tokens', function () {
-    before('Check network has enough vega tokens in reward pool - to test', function () {
-        assert.isAtLeast(this.vega_reward_pool_balance, 0.00001,
-            'Asserting that the Vega reward pool has at least 1 token'
+    before(
+      'Check network has enough vega tokens in reward pool - to test',
+      function () {
+        assert.isAtLeast(
+          this.vega_reward_pool_balance,
+          0.00001,
+          'Asserting that the Vega reward pool has at least 1 token'
         );
-    })
+      }
+    );
 
     beforeEach(
       'teardown wallet & drill into a specific validator',
@@ -76,14 +81,14 @@ context('Rewards Tab - with eth and vega wallets connected', function () {
         txTimeout
       );
 
-    //   cy.get(ethWalletTotalAssociatedBalance, txTimeout)
-    //     .contains('3.0', txTimeout)
-    //     .should('be.visible');
+      //   cy.get(ethWalletTotalAssociatedBalance, txTimeout)
+      //     .contains('3.0', txTimeout)
+      //     .should('be.visible');
 
-    //   cy.get(ethWalletAssociatedBalances, txTimeout)
-    //     .contains(vegaWalletPublicKeyShort, txTimeout)
-    //     .parent()
-    //     .should('contain', 3.0, txTimeout);
+      //   cy.get(ethWalletAssociatedBalances, txTimeout)
+      //     .contains(vegaWalletPublicKeyShort, txTimeout)
+      //     .parent()
+      //     .should('contain', 3.0, txTimeout);
 
       cy.get('button').contains('Select a validator to nominate').click();
 
@@ -121,28 +126,30 @@ context('Rewards Tab - with eth and vega wallets connected', function () {
       }
     );
 
-
     Cypress.Commands.add('get_global_reward_pool_info', () => {
-        let mutation = '{ assets {name id decimals globalRewardPoolAccount {balance}}}';
-        cy.request({
-          method: 'POST',
-          url: `http://localhost:3028/query`,
-          body: {
-            query: mutation,
-          },
-          headers: { 'content-type': 'application/json' },
-        })
-          .its(`body.data.assets`)
-          .then(function (response) {
-            let object = response.reduce(function (reward_pool, entry) {
-                reward_pool[entry.name] = {balance: entry.globalRewardPoolAccount.balance,id: entry.id,decimals: entry.decimals};
-              return reward_pool;
-            }, {});
-  
-            return object;
-          });
-      });
+      let mutation =
+        '{ assets {name id decimals globalRewardPoolAccount {balance}}}';
+      cy.request({
+        method: 'POST',
+        url: `http://localhost:3028/query`,
+        body: {
+          query: mutation,
+        },
+        headers: { 'content-type': 'application/json' },
+      })
+        .its(`body.data.assets`)
+        .then(function (response) {
+          let object = response.reduce(function (reward_pool, entry) {
+            reward_pool[entry.name] = {
+              balance: entry.globalRewardPoolAccount.balance,
+              id: entry.id,
+              decimals: entry.decimals,
+            };
+            return reward_pool;
+          }, {});
 
-
+          return object;
+        });
+    });
   });
 });
