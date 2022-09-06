@@ -18,20 +18,25 @@ context('Rewards Tab - with eth and vega wallets connected', function () {
     cy.ethereum_wallet_connect();
     cy.navigate_to('staking');
     cy.wait_for_spinner();
-    cy.vega_wallet_send_to_reward_pool('Vega','50');
+    cy.vega_wallet_send_to_reward_pool('Vega', '50');
     // cy.wait(5000) // temporary
 
     cy.get_global_reward_pool_info().then((rewards) => {
       cy.wrap(parseInt(rewards['Vega'].balance)).as('vega_reward_pool_balance');
-    })
+    });
   });
 
   describe('Eth wallet - contains VEGA tokens', function () {
-    before('Check network has enough vega tokens in reward pool - to test', function () {
-        assert.isAtLeast(this.vega_reward_pool_balance, 0.00001,
-            'Asserting that the Vega reward pool has at least 1 token'
+    before(
+      'Check network has enough vega tokens in reward pool - to test',
+      function () {
+        assert.isAtLeast(
+          this.vega_reward_pool_balance,
+          0.00001,
+          'Asserting that the Vega reward pool has at least 1 token'
         );
-    })
+      }
+    );
 
     beforeEach(
       'teardown wallet & drill into a specific validator',
@@ -51,14 +56,14 @@ context('Rewards Tab - with eth and vega wallets connected', function () {
         txTimeout
       );
 
-    //   cy.get(ethWalletTotalAssociatedBalance, txTimeout)
-    //     .contains('3.0', txTimeout)
-    //     .should('be.visible');
+      //   cy.get(ethWalletTotalAssociatedBalance, txTimeout)
+      //     .contains('3.0', txTimeout)
+      //     .should('be.visible');
 
-    //   cy.get(ethWalletAssociatedBalances, txTimeout)
-    //     .contains(vegaWalletPublicKeyShort, txTimeout)
-    //     .parent()
-    //     .should('contain', 3.0, txTimeout);
+      //   cy.get(ethWalletAssociatedBalances, txTimeout)
+      //     .contains(vegaWalletPublicKeyShort, txTimeout)
+      //     .parent()
+      //     .should('contain', 3.0, txTimeout);
 
       cy.get('button').contains('Select a validator to nominate').click();
 
@@ -95,6 +100,5 @@ context('Rewards Tab - with eth and vega wallets connected', function () {
     //     cy.vega_wallet_teardown();
     //   }
     // );
-
   });
 });
