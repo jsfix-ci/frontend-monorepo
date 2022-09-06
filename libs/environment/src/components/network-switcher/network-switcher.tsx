@@ -6,9 +6,12 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  Indicator,
+  Intent,
 } from '@vegaprotocol/ui-toolkit';
 import { useEnvironment } from '../../hooks/use-environment';
 import { Networks } from '../../types';
+import get from 'lodash/get';
 
 export const envNameMapping: Record<Networks, string> = {
   [Networks.CUSTOM]: t('Custom'),
@@ -72,7 +75,6 @@ export const NetworkSwitcher = () => {
   const { VEGA_ENV, VEGA_NETWORKS } = useEnvironment();
   const [isOpen, setOpen] = useState(false);
   const [isAdvancedView, setAdvancedView] = useState(false);
-
   const handleOpen = useCallback(
     (isOpen: boolean) => {
       setOpen(isOpen);
@@ -86,6 +88,9 @@ export const NetworkSwitcher = () => {
   return (
     <DropdownMenu open={isOpen} onOpenChange={handleOpen}>
       <DropdownMenuTrigger className="text-white dark:text-white">
+        {VEGA_NETWORKS && VEGA_ENV && (
+          <Indicator variant={getStatusIndicator(VEGA_NETWORKS, VEGA_ENV)} />
+        )}
         {envTriggerMapping[VEGA_ENV]}
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start">
@@ -98,6 +103,7 @@ export const NetworkSwitcher = () => {
                 disabled={!VEGA_NETWORKS[key]}
               >
                 <a href={VEGA_NETWORKS[key]}>
+                  <Indicator variant={getStatusIndicator(VEGA_NETWORKS, key)} />
                   {envNameMapping[key]}
                   <NetworkLabel
                     isCurrent={VEGA_ENV === key}
@@ -122,6 +128,7 @@ export const NetworkSwitcher = () => {
             {advancedNetworkKeys.map((key) => (
               <DropdownMenuItem key={key} data-testid="network-item-advanced">
                 <div className="mr-4">
+                  <Indicator variant={getStatusIndicator(VEGA_NETWORKS, key)} />
                   <Link href={VEGA_NETWORKS[key]}>{envNameMapping[key]}</Link>
                   <NetworkLabel
                     isCurrent={VEGA_ENV === key}
@@ -138,4 +145,11 @@ export const NetworkSwitcher = () => {
       </DropdownMenuContent>
     </DropdownMenu>
   );
+};
+
+const getStatusIndicator = (
+  networks: Partial<Record<Networks, string>>,
+  key: Networks
+): Intent => {
+  return get(networks, key) ? Intent.Success : Intent.Danger;
 };
