@@ -210,3 +210,17 @@ Cypress.Commands.add(
       });
   }
 );
+
+Cypress.Commands.add('get_current_epoch', () => {
+  let mutation = '{epoch {id}}';
+  cy.request({
+    method: 'POST',
+    url: `http://localhost:3028/query`,
+    body: {
+      query: mutation,
+    },
+    headers: { 'content-type': 'application/json' },
+  })
+    .its(`body.data.epoch.id`)
+    .then(id => {return id});
+});

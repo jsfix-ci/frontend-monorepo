@@ -21,46 +21,49 @@ Cypress.Commands.add('vega_wallet_send_to_reward_pool', (name, amount) => {
   cy.highlight(
     `Sending ${name} from Vega Wallet to reward pool amount: ${amount}`
   );
-  cy.get_global_reward_pool_info().then((rewards) => {
-    for (let i = 0; i < rewards[name].decimals; i++) amount += '0';
+  cy.get_current_epoch().then((currentEpoch) => {
+    currentEpoch = parseInt(currentEpoch);
+    cy.get_global_reward_pool_info().then((assets) => {
+      for (let i = 0; i < assets[name].decimals; i++) amount += '0';
 
-    // cy.ensure_specified_unstaked_tokens_are_associated(50000); b4f2726571fbe8e33b442dc92ed2d7f0d810e21835b7371a7915a365f07ccd9b
+      // b4f2726571fbe8e33b442dc92ed2d7f0d810e21835b7371a7915a365f07ccd9b
 
-    cy.log(`vegawallet command send -w ${vegaWalletName} --pubkey ${vegaWalletPublicKey} -p ./src/fixtures/wallet/passphrase --home ${vegaWalletLocation} --network DV '{
-      "transfer":{
-          "fromAccountType": "ACCOUNT_TYPE_GENERAL",
-          "toAccountType": "ACCOUNT_TYPE_GLOBAL_REWARD",
-          "to":"0000000000000000000000000000000000000000000000000000000000000000",
-          "asset":"${rewards[name].id}",
-          "amount":"${amount}",
-          "recurring":{ 
-            "start_epoch": 1,
-            "end_epoch": 10000000000,
-            "factor": 1
+      cy.log(`vegawallet command send -w ${vegaWalletName} --pubkey ${vegaWalletPublicKey} -p ./src/fixtures/wallet/passphrase --home ${vegaWalletLocation} --network DV '{
+        "transfer":{
+            "fromAccountType": "ACCOUNT_TYPE_GENERAL",
+            "toAccountType": "ACCOUNT_TYPE_GLOBAL_REWARD",
+            "to":"0000000000000000000000000000000000000000000000000000000000000000",
+            "asset":"${assets[name].id}",
+            "amount":"${amount}",
+            "recurring":{ 
+              "start_epoch": "${currentEpoch+1}",
+              "end_epoch": "${currentEpoch+2}",
+              "factor": 1
+          }
         }
-      }
-    }'`);
+      }'`);
 
-    cy.exec(
-      `vegawallet command send -w ${vegaWalletName} --pubkey ${vegaWalletPublicKey} -p ./src/fixtures/wallet/passphrase --home ${vegaWalletLocation} --network DV '{
-      "transfer":{
-          "fromAccountType": "ACCOUNT_TYPE_GENERAL",
-          "toAccountType": "ACCOUNT_TYPE_GLOBAL_REWARD",
-          "to":"0000000000000000000000000000000000000000000000000000000000000000",
-          "asset":"${rewards[name].id}",
-          "amount":"${amount}",
-          "recurring":{ 
-            "start_epoch": "2160",
-            "end_epoch": "2161",
-            "factor": "1"
+      cy.exec(
+        `vegawallet command send -w ${vegaWalletName} --pubkey ${vegaWalletPublicKey} -p ./src/fixtures/wallet/passphrase --home ${vegaWalletLocation} --network DV '{
+        "transfer":{
+            "fromAccountType": "ACCOUNT_TYPE_GENERAL",
+            "toAccountType": "ACCOUNT_TYPE_GLOBAL_REWARD",
+            "to":"0000000000000000000000000000000000000000000000000000000000000000",
+            "asset":"${assets[name].id}",
+            "amount":"${amount}",
+            "recurring":{ 
+              "start_epoch": "${currentEpoch+1}",
+              "end_epoch": "${currentEpoch+2}",
+              "factor": "1"
+          }
         }
-      }
-    }'`
-    )
-      .its('stdout')
-      .then((output) => {
-        cy.log(output);
-      });
+      }'`
+      )
+        .its('stdout')
+        .then((output) => {
+          cy.log(output);
+        });
+    });
   });
 });
 
@@ -107,3 +110,4 @@ Cypress.Commands.add('get_global_reward_pool_info', () => {
       return object;
     });
 });
+
