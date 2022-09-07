@@ -20,8 +20,6 @@ context('Rewards Tab - with eth and vega wallets connected', function () {
     cy.wait_for_spinner();
     cy.wait_for_begining_of_epoch();
     cy.vega_wallet_send_to_reward_pool('Vega', '50');
-  
-    
 
     cy.get_global_reward_pool_info().then((rewards) => {
       cy.wrap(parseInt(rewards['Vega'].balance)).as('vega_reward_pool_balance');

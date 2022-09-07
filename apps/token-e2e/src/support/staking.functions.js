@@ -222,5 +222,7 @@ Cypress.Commands.add('get_current_epoch', () => {
     headers: { 'content-type': 'application/json' },
   })
     .its(`body.data.epoch.id`)
-    .then(id => {return id});
+    .then((id) => {
+      return id;
+    });
 });

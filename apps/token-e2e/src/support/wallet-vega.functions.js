@@ -36,8 +36,8 @@ Cypress.Commands.add('vega_wallet_send_to_reward_pool', (name, amount) => {
             "asset":"${assets[name].id}",
             "amount":"${amount}",
             "recurring":{ 
-              "start_epoch": "${currentEpoch+1}",
-              "end_epoch": "${currentEpoch+2}",
+              "start_epoch": "${currentEpoch + 1}",
+              "end_epoch": "${currentEpoch + 2}",
               "factor": 1
           }
         }
@@ -52,8 +52,8 @@ Cypress.Commands.add('vega_wallet_send_to_reward_pool', (name, amount) => {
             "asset":"${assets[name].id}",
             "amount":"${amount}",
             "recurring":{ 
-              "start_epoch": "${currentEpoch+1}",
-              "end_epoch": "${currentEpoch+2}",
+              "start_epoch": "${currentEpoch + 1}",
+              "end_epoch": "${currentEpoch + 2}",
               "factor": "1"
           }
         }
@@ -110,4 +110,3 @@ Cypress.Commands.add('get_global_reward_pool_info', () => {
       return object;
     });
 });
-
