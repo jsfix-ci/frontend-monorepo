@@ -18,12 +18,13 @@ Cypress.Commands.add('vega_wallet_import', () => {
 });
 
 Cypress.Commands.add('vega_wallet_send_to_reward_pool', (name, amount) => {
-  cy.highlight(`Sending ${name} from Vega Wallet to reward pool amount: ${amount}`);
+  cy.highlight(
+    `Sending ${name} from Vega Wallet to reward pool amount: ${amount}`
+  );
   cy.get_global_reward_pool_info().then((rewards) => {
+    for (let i = 0; i < rewards[name].decimals; i++) amount += '0';
 
-    for(let i = 0; i < rewards[name].decimals; i++) amount += "0";
-
-  // cy.ensure_specified_unstaked_tokens_are_associated(50000); b4f2726571fbe8e33b442dc92ed2d7f0d810e21835b7371a7915a365f07ccd9b
+    // cy.ensure_specified_unstaked_tokens_are_associated(50000); b4f2726571fbe8e33b442dc92ed2d7f0d810e21835b7371a7915a365f07ccd9b
 
     cy.log(`vegawallet command send -w ${vegaWalletName} --pubkey ${vegaWalletPublicKey} -p ./src/fixtures/wallet/passphrase --home ${vegaWalletLocation} --network DV '{
       "transfer":{
@@ -38,7 +39,7 @@ Cypress.Commands.add('vega_wallet_send_to_reward_pool', (name, amount) => {
             "factor": 1
         }
       }
-    }'`)
+    }'`);
 
     cy.exec(
       `vegawallet command send -w ${vegaWalletName} --pubkey ${vegaWalletPublicKey} -p ./src/fixtures/wallet/passphrase --home ${vegaWalletLocation} --network DV '{
@@ -54,11 +55,14 @@ Cypress.Commands.add('vega_wallet_send_to_reward_pool', (name, amount) => {
             "factor": "1"
         }
       }
-    }'`)
-    .its('stdout')
-    .then(output => {cy.log(output)});
-})
-})
+    }'`
+    )
+      .its('stdout')
+      .then((output) => {
+        cy.log(output);
+      });
+  });
+});
 
 Cypress.Commands.add('vega_wallet_connect', () => {
   cy.highlight('Connecting Vega Wallet');
@@ -79,7 +83,8 @@ Cypress.Commands.add('vega_wallet_connect', () => {
 });
 
 Cypress.Commands.add('get_global_reward_pool_info', () => {
-  let mutation = '{ assets {name id decimals globalRewardPoolAccount {balance}}}';
+  let mutation =
+    '{ assets {name id decimals globalRewardPoolAccount {balance}}}';
   cy.request({
     method: 'POST',
     url: `http://localhost:3028/query`,
@@ -91,7 +96,11 @@ Cypress.Commands.add('get_global_reward_pool_info', () => {
     .its(`body.data.assets`)
     .then(function (response) {
       let object = response.reduce(function (reward_pool, entry) {
-          reward_pool[entry.name] = {balance: entry.globalRewardPoolAccount.balance,id: entry.id,decimals: entry.decimals};
+        reward_pool[entry.name] = {
+          balance: entry.globalRewardPoolAccount.balance,
+          id: entry.id,
+          decimals: entry.decimals,
+        };
         return reward_pool;
       }, {});
 
