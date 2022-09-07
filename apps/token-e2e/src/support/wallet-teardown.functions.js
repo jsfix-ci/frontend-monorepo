@@ -1,4 +1,5 @@
 import {
+  CollateralBridge,
   StakingBridge,
   Token,
   TokenVesting,
@@ -11,7 +12,9 @@ const vegaWalletMnemonic = Cypress.env('vegaWalletMnemonic');
 const vegaWalletPubKey = Cypress.env('vegaWalletPublicKey');
 const vegaTokenContractAddress = Cypress.env('vegaTokenContractAddress');
 const vegaTokenAddress = Cypress.env('vegaTokenAddress');
+const collateralBridgeAddress = Cypress.env('collateralBridgeAddress');
 const ethWalletPubKey = Cypress.env('ethWalletPublicKey');
+
 const ethStakingBridgeContractAddress = Cypress.env(
   'ethStakingBridgeContractAddress'
 );
@@ -118,6 +121,27 @@ Cypress.Commands.add('vega_wallet_teardown_vesting', (vestingContract) => {
         cy.wait_for_transaction(tx);
       });
     }
+  });
+});
+
+Cypress.Commands.add('deposit', function (resetAmount) {
+  cy.highlight(`Setting token approval amount to ${resetAmount}`);
+  cy.wrap(new CollateralBridge(collateralBridgeAddress, this.signer), {
+    log: false,
+  }).then((collateralBridge) => {
+    cy.wrap(
+      collateralBridge.deposit_asset(
+        '0xb4f2726571fbe8e33b442dc92ed2d7f0d810e21835b7371a7915a365f07ccd9b', // gotcha, got to put 0x at the front
+        resetAmount,
+        vegaWalletPubKey
+      ),
+      {
+        timeout: transactionTimeout,
+        log: false,
+      }
+    ).then((tx) => {
+      cy.wait_for_transaction(tx);
+    });
   });
 });
 
