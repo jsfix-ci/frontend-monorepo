@@ -128,26 +128,31 @@ Cypress.Commands.add('vega_wallet_teardown_vesting', (vestingContract) => {
   });
 });
 
-Cypress.Commands.add('vega_wallet_top_up_with_real_vega_tokens', function (resetAmount) {
-  cy.highlight(`Topping up vega wallet with real vega, amount: ${resetAmount}`);
-  cy.wrap(new CollateralBridge(collateralBridgeAddress, this.signer), {
-    log: false,
-  }).then((collateralBridge) => {
-    cy.wrap(
-      collateralBridge.deposit_asset(
-        realVegaBridgeContractAddress, // gotcha, got to put 0x at the front
-        resetAmount,
-        vegaWalletPubKey
-      ),
-      {
-        timeout: transactionTimeout,
-        log: false,
-      }
-    ).then((tx) => {
-      cy.wait_for_transaction(tx);
+Cypress.Commands.add(
+  'vega_wallet_top_up_with_real_vega_tokens',
+  function (resetAmount) {
+    cy.highlight(
+      `Topping up vega wallet with real vega, amount: ${resetAmount}`
+    );
+    cy.wrap(new CollateralBridge(collateralBridgeAddress, this.signer), {
+      log: false,
+    }).then((collateralBridge) => {
+      cy.wrap(
+        collateralBridge.deposit_asset(
+          realVegaBridgeContractAddress, // gotcha, got to put 0x at the front
+          resetAmount,
+          vegaWalletPubKey
+        ),
+        {
+          timeout: transactionTimeout,
+          log: false,
+        }
+      ).then((tx) => {
+        cy.wait_for_transaction(tx);
+      });
     });
-  });
-});
+  }
+);
 
 Cypress.Commands.add('wait_for_transaction', (tx) => {
   cy.wrap(tx.wait(1).catch(cy.log), { timeout: transactionTimeout });
