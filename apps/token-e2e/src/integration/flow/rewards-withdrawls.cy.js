@@ -16,6 +16,8 @@ context('Rewards Tab - with eth and vega wallets connected', function () {
     cy.verify_page_header('The $VEGA token');
     cy.vega_wallet_connect();
     cy.ethereum_wallet_connect();
+    cy.vega_wallet_top_up_with_real_vega_tokens('1');
+    cy.pause();
     cy.navigate_to('staking');
     cy.wait_for_spinner();
     cy.wait_for_begining_of_epoch();
