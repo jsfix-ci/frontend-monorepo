@@ -19,9 +19,7 @@ const ethStakingBridgeContractAddress = Cypress.env(
   'ethStakingBridgeContractAddress'
 );
 
-const realVegaBridgeContractAddress = Cypress.env(
-  'realVegaBridgeContractAddress'
-);
+const assetEthId = Cypress.env('assetEthId');
 const ethProviderUrl = Cypress.env('ethProviderUrl');
 const getAccount = (number = 0) => `m/44'/60'/0'/0/${number}`;
 const transactionTimeout = '90000';
@@ -134,14 +132,19 @@ Cypress.Commands.add(
     cy.highlight(
       `Topping up vega wallet with real vega, amount: ${resetAmount}`
     );
+
+    cy.log('collateralBridgeAddress: ' + collateralBridgeAddress)
     cy.wrap(new CollateralBridge(collateralBridgeAddress, this.signer), {
       log: false,
     }).then((collateralBridge) => {
+      cy.log('assetEthId: ' + assetEthId)
+      cy.log('resetAmount: ' + resetAmount)
+      cy.log('vegaWalletPubKey: 0x' + vegaWalletPubKey)
       cy.wrap(
         collateralBridge.deposit_asset(
-          realVegaBridgeContractAddress, // gotcha, got to put 0x at the front
+          assetEthId, // gotcha, got to put 0x at the front
           resetAmount,
-          vegaWalletPubKey
+          '0x' + vegaWalletPubKey
         ),
         {
           timeout: transactionTimeout,
