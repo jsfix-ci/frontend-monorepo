@@ -133,13 +133,13 @@ Cypress.Commands.add(
       `Topping up vega wallet with real vega, amount: ${resetAmount}`
     );
 
-    cy.log('collateralBridgeAddress: ' + collateralBridgeAddress)
+    cy.log('collateralBridgeAddress: ' + collateralBridgeAddress);
     cy.wrap(new CollateralBridge(collateralBridgeAddress, this.signer), {
       log: false,
     }).then((collateralBridge) => {
-      cy.log('assetEthId: ' + assetEthId)
-      cy.log('resetAmount: ' + resetAmount)
-      cy.log('vegaWalletPubKey: 0x' + vegaWalletPubKey)
+      cy.log('assetEthId: ' + assetEthId);
+      cy.log('resetAmount: ' + resetAmount);
+      cy.log('vegaWalletPubKey: 0x' + vegaWalletPubKey);
       cy.wrap(
         collateralBridge.deposit_asset(
           assetEthId, // gotcha, got to put 0x at the front
