@@ -15,10 +15,7 @@ export const PageQueryContainer = <TData, TVariables = OperationVariables>({
   options,
   render,
 }: PageQueryContainerProps<TData, TVariables>) => {
-  const { data, loading, error } = useQuery<TData, TVariables>(query, {
-    ...options,
-    errorPolicy: 'ignore',
-  });
+  const { data, loading, error } = useQuery<TData, TVariables>(query, options);
 
   return (
     <AsyncRenderer<TData>

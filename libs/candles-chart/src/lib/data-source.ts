@@ -1,21 +1,22 @@
+import compact from 'lodash/compact';
 import type { ApolloClient } from '@apollo/client';
 import type { Candle, DataSource } from 'pennant';
 import { Interval as PennantInterval } from 'pennant';
 
 import { addDecimal } from '@vegaprotocol/react-helpers';
-import { ChartDocument } from './__generated__/Chart';
-import type { ChartQuery, ChartQueryVariables } from './__generated__/Chart';
+import { ChartDocument } from './__generated___/Chart';
+import type { ChartQuery, ChartQueryVariables } from './__generated___/Chart';
 import {
   CandlesDocument,
   CandlesEventsDocument,
-} from './__generated__/Candles';
+} from './__generated___/Candles';
 import type {
   CandlesQuery,
   CandlesQueryVariables,
   CandleFieldsFragment,
   CandlesEventsSubscription,
   CandlesEventsSubscriptionVariables,
-} from './__generated__/Candles';
+} from './__generated___/Candles';
 import type { Subscription } from 'zen-observable-ts';
 import { Interval } from '@vegaprotocol/types';
 
@@ -142,14 +143,15 @@ export class VegaDataSource implements DataSource {
         },
         fetchPolicy: 'no-cache',
       });
+      console.log(data);
 
-      if (data && data.market && data.market.candles) {
+      if (data && data.market && data.market.candlesConnection) {
         const decimalPlaces = data.market.decimalPlaces;
 
-        const candles = data.market.candles
+        const candles = compact(data.market.candlesConnection.edges)
+          .map((e) => e.node)
           .filter((d): d is CandleFieldsFragment => d !== null)
           .map((d) => parseCandle(d, decimalPlaces));
-
         return candles;
       } else {
         return [];
@@ -198,8 +200,9 @@ function parseCandle(
   candle: CandleFieldsFragment,
   decimalPlaces: number
 ): Candle {
+  console.log(candle);
   return {
-    date: new Date(Number(candle.timestamp) / 1_000_000),
+    date: new Date(candle.periodStart),
     high: Number(addDecimal(candle.high, decimalPlaces)),
     low: Number(addDecimal(candle.low, decimalPlaces)),
     open: Number(addDecimal(candle.open, decimalPlaces)),
