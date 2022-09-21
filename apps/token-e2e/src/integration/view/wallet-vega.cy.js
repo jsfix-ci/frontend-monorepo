@@ -9,7 +9,6 @@ const dialogHeader = '[data-testid="dialog-title"]';
 const connectorsList = '[data-testid="connectors-list"]';
 const dialogCloseBtn = '[data-testid="dialog-close"]';
 const restConnectorForm = '[data-testid="rest-connector-form"]';
-const restUrl = '#url';
 const restWallet = '#wallet';
 const restPassphrase = '#passphrase';
 const restConnectBtn = '[type="submit"]';
@@ -96,14 +95,6 @@ context('Vega Wallet - verify elements on widget', function () {
       });
     });
 
-    it('should have url field visible', function () {
-      cy.get(restConnectorForm).within(() => {
-        cy.get(restUrl)
-          .should('be.visible')
-          .and('have.value', 'http://localhost:1789/api/v1');
-      });
-    });
-
     it('should have wallet field visible', function () {
       cy.get(restConnectorForm).within(() => {
         cy.get(restWallet).should('be.visible');
@@ -170,7 +161,7 @@ context('Vega Wallet - verify elements on widget', function () {
       });
     });
 
-    it('should have wallet name visible', function () {
+    it.skip('should have wallet name visible', function () {
       cy.get(walletContainer).within(() => {
         cy.get(walletName)
           .should('be.visible')
@@ -238,7 +229,7 @@ context('Vega Wallet - verify elements on widget', function () {
       });
     });
 
-    it('should have vega wallet public key and name visible', function () {
+    it.skip('should have vega wallet public key and name visible', function () {
       cy.get(dialog).within(() => {
         cy.get(dialogVegaKey)
           .should('be.visible')

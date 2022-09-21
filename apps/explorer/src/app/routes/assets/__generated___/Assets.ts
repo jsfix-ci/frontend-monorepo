@@ -1,4 +1,4 @@
-import * as Types from '@vegaprotocol/types/types';
+import { Schema as Types } from '@vegaprotocol/types';
 
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
@@ -6,7 +6,7 @@ const defaultOptions = {} as const;
 export type AssetsQueryQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type AssetsQueryQuery = { __typename?: 'Query', assetsConnection: { __typename?: 'AssetsConnection', edges?: Array<{ __typename?: 'AssetEdge', node: { __typename?: 'Asset', id: string, name: string, symbol: string, decimals: number, source: { __typename?: 'BuiltinAsset', maxFaucetAmountMint: string } | { __typename?: 'ERC20', contractAddress: string }, infrastructureFeeAccount: { __typename?: 'Account', type: Types.AccountType, balance: string, market?: { __typename?: 'Market', id: string } | null } } } | null> | null } };
+export type AssetsQueryQuery = { __typename?: 'Query', assetsConnection?: { __typename?: 'AssetsConnection', edges?: Array<{ __typename?: 'AssetEdge', node: { __typename?: 'Asset', id: string, name: string, symbol: string, decimals: number, source: { __typename?: 'BuiltinAsset', maxFaucetAmountMint: string } | { __typename?: 'ERC20', contractAddress: string }, infrastructureFeeAccount: { __typename?: 'Account', type: Types.AccountType, balance: string, market?: { __typename?: 'Market', id: string } | null } } } | null> | null } | null };
 
 
 export const AssetsQueryDocument = gql`

@@ -1,9 +1,9 @@
-import * as Types from '@vegaprotocol/types/types';
+import { Schema as Types } from '@vegaprotocol/types';
 
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 const defaultOptions = {} as const;
-export type CandleFieldsFragment = { __typename?: 'Candle', datetime: string, high: string, low: string, open: string, close: string, volume: string };
+export type CandleFieldsFragment = { __typename?: 'Candle', timestamp: string, high: string, low: string, open: string, close: string, volume: string };
 
 export type CandlesQueryVariables = Types.Exact<{
   marketId: Types.Scalars['ID'];
@@ -12,19 +12,19 @@ export type CandlesQueryVariables = Types.Exact<{
 }>;
 
 
-export type CandlesQuery = { __typename?: 'Query', market?: { __typename?: 'Market', id: string, decimalPlaces: number, tradableInstrument: { __typename?: 'TradableInstrument', instrument: { __typename?: 'Instrument', id: string, name: string, code: string } }, candles?: Array<{ __typename?: 'Candle', datetime: string, high: string, low: string, open: string, close: string, volume: string } | null> | null } | null };
+export type CandlesQuery = { __typename?: 'Query', market?: { __typename?: 'Market', id: string, decimalPlaces: number, tradableInstrument: { __typename?: 'TradableInstrument', instrument: { __typename?: 'Instrument', id: string, name: string, code: string } }, candles?: Array<{ __typename?: 'Candle', timestamp: string, high: string, low: string, open: string, close: string, volume: string } | null> | null } | null };
 
-export type CandlesSubSubscriptionVariables = Types.Exact<{
+export type CandlesEventsSubscriptionVariables = Types.Exact<{
   marketId: Types.Scalars['ID'];
   interval: Types.Interval;
 }>;
 
 
-export type CandlesSubSubscription = { __typename?: 'Subscription', candles: { __typename?: 'Candle', datetime: string, high: string, low: string, open: string, close: string, volume: string } };
+export type CandlesEventsSubscription = { __typename?: 'Subscription', candles: { __typename?: 'Candle', timestamp: string, high: string, low: string, open: string, close: string, volume: string } };
 
 export const CandleFieldsFragmentDoc = gql`
     fragment CandleFields on Candle {
-  datetime
+  timestamp
   high
   low
   open
@@ -80,8 +80,8 @@ export function useCandlesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Ca
 export type CandlesQueryHookResult = ReturnType<typeof useCandlesQuery>;
 export type CandlesLazyQueryHookResult = ReturnType<typeof useCandlesLazyQuery>;
 export type CandlesQueryResult = Apollo.QueryResult<CandlesQuery, CandlesQueryVariables>;
-export const CandlesSubDocument = gql`
-    subscription CandlesSub($marketId: ID!, $interval: Interval!) {
+export const CandlesEventsDocument = gql`
+    subscription CandlesEvents($marketId: ID!, $interval: Interval!) {
   candles(marketId: $marketId, interval: $interval) {
     ...CandleFields
   }
@@ -89,25 +89,25 @@ export const CandlesSubDocument = gql`
     ${CandleFieldsFragmentDoc}`;
 
 /**
- * __useCandlesSubSubscription__
+ * __useCandlesEventsSubscription__
  *
- * To run a query within a React component, call `useCandlesSubSubscription` and pass it any options that fit your needs.
- * When your component renders, `useCandlesSubSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useCandlesEventsSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useCandlesEventsSubscription` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useCandlesSubSubscription({
+ * const { data, loading, error } = useCandlesEventsSubscription({
  *   variables: {
  *      marketId: // value for 'marketId'
  *      interval: // value for 'interval'
  *   },
  * });
  */
-export function useCandlesSubSubscription(baseOptions: Apollo.SubscriptionHookOptions<CandlesSubSubscription, CandlesSubSubscriptionVariables>) {
+export function useCandlesEventsSubscription(baseOptions: Apollo.SubscriptionHookOptions<CandlesEventsSubscription, CandlesEventsSubscriptionVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useSubscription<CandlesSubSubscription, CandlesSubSubscriptionVariables>(CandlesSubDocument, options);
+        return Apollo.useSubscription<CandlesEventsSubscription, CandlesEventsSubscriptionVariables>(CandlesEventsDocument, options);
       }
-export type CandlesSubSubscriptionHookResult = ReturnType<typeof useCandlesSubSubscription>;
-export type CandlesSubSubscriptionResult = Apollo.SubscriptionResult<CandlesSubSubscription>;
+export type CandlesEventsSubscriptionHookResult = ReturnType<typeof useCandlesEventsSubscription>;
+export type CandlesEventsSubscriptionResult = Apollo.SubscriptionResult<CandlesEventsSubscription>;

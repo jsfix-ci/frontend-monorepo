@@ -2,7 +2,7 @@ import { gql } from '@apollo/client';
 import produce from 'immer';
 import BigNumber from 'bignumber.js';
 import sortBy from 'lodash/sortBy';
-import type { Accounts_party_accounts } from '@vegaprotocol/accounts';
+import type { AccountFieldsFragment } from '@vegaprotocol/accounts';
 import { accountsDataProvider } from '@vegaprotocol/accounts';
 import { toBigNum } from '@vegaprotocol/react-helpers';
 import type { Positions, Positions_party } from './__generated__/Positions';
@@ -117,16 +117,16 @@ export const POSITIONS_SUBSCRIPTION = gql`
 
 export const getMetrics = (
   data: Positions_party | null,
-  accounts: Accounts_party_accounts[] | null
+  accounts: AccountFieldsFragment[] | null
 ): Position[] => {
-  if (!data || !data?.positionsConnection.edges) {
+  if (!data || !data?.positionsConnection?.edges) {
     return [];
   }
   const metrics: Position[] = [];
   data?.positionsConnection.edges.forEach((position) => {
     const market = position.node.market;
     const marketData = market.data;
-    const marginLevel = position.node.marginsConnection.edges?.find(
+    const marginLevel = position.node.marginsConnection?.edges?.find(
       (margin) => margin.node.market.id === market.id
     )?.node;
     const marginAccount = accounts?.find((account) => {
@@ -232,31 +232,33 @@ export const getMetrics = (
 
 export const update = (
   data: Positions_party,
-  delta: PositionsSubscription_positions | null
+  deltas: PositionsSubscription_positions[]
 ) => {
   return produce(data, (draft) => {
-    if (!draft.positionsConnection.edges || !delta) {
-      return;
-    }
-    const index = draft.positionsConnection.edges.findIndex(
-      (edge) => edge.node.market.id === delta.market.id
-    );
-    if (index !== -1) {
-      draft.positionsConnection.edges[index].node = delta;
-    } else {
-      draft.positionsConnection.edges.push({
-        __typename: 'PositionEdge',
-        node: delta,
-      });
-    }
+    deltas.forEach((delta) => {
+      if (!draft.positionsConnection?.edges || !delta) {
+        return;
+      }
+      const index = draft.positionsConnection.edges.findIndex(
+        (edge) => edge.node.market.id === delta.market.id
+      );
+      if (index !== -1) {
+        draft.positionsConnection.edges[index].node = delta;
+      } else {
+        draft.positionsConnection.edges.push({
+          __typename: 'PositionEdge',
+          node: delta,
+        });
+      }
+    });
   });
 };
 
-export const positionDataProvider = makeDataProvider<
+export const positionsDataProvider = makeDataProvider<
   Positions,
   Positions_party,
   PositionsSubscription,
-  PositionsSubscription_positions
+  PositionsSubscription_positions[]
 >({
   query: POSITIONS_QUERY,
   subscriptionQuery: POSITIONS_SUBSCRIPTION,
@@ -266,15 +268,15 @@ export const positionDataProvider = makeDataProvider<
     subscriptionData.positions,
 });
 
-export const positionsMetricsDataProvider = makeDerivedDataProvider<Position[]>(
-  [positionDataProvider, accountsDataProvider],
-  ([positions, accounts]) => {
-    return sortBy(
-      getMetrics(
-        positions as Positions_party | null,
-        accounts as Accounts_party_accounts[] | null
-      ),
-      'updatedAt'
-    ).reverse();
-  }
-);
+export const positionsMetricsDataProvider = makeDerivedDataProvider<
+  Position[],
+  never
+>([positionsDataProvider, accountsDataProvider], ([positions, accounts]) => {
+  return sortBy(
+    getMetrics(
+      positions as Positions_party | null,
+      accounts as AccountFieldsFragment[] | null
+    ),
+    'updatedAt'
+  ).reverse();
+});

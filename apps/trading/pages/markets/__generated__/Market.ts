@@ -20,7 +20,7 @@ export interface Market_market_data_market {
 export interface Market_market_data {
   __typename: "MarketData";
   /**
-   * market ID of the associated mark price
+   * market of the associated mark price
    */
   market: Market_market_data_market;
   /**
@@ -103,6 +103,10 @@ export interface Market_market_tradableInstrument_instrument_product_settlementA
    * The full name of the asset (e.g: Great British Pound)
    */
   name: string;
+  /**
+   * The precision of the asset. Should match the decimal precision of the asset on its native chain, e.g: for ERC20 assets, it is often 18
+   */
+  decimals: number;
 }
 
 export interface Market_market_tradableInstrument_instrument_product {
@@ -165,8 +169,8 @@ export interface Market_market_marketTimestamps {
   close: string | null;
 }
 
-export interface Market_market_candles {
-  __typename: "Candle";
+export interface Market_market_candlesConnection_edges_node {
+  __typename: "CandleNode";
   /**
    * Open price (uint64)
    */
@@ -179,6 +183,19 @@ export interface Market_market_candles {
    * Volume price (uint64)
    */
   volume: string;
+}
+
+export interface Market_market_candlesConnection_edges {
+  __typename: "CandleEdge";
+  node: Market_market_candlesConnection_edges_node;
+}
+
+export interface Market_market_candlesConnection {
+  __typename: "CandleDataConnection";
+  /**
+   * The candles
+   */
+  edges: (Market_market_candlesConnection_edges | null)[] | null;
 }
 
 export interface Market_market {
@@ -232,9 +249,9 @@ export interface Market_market {
    */
   marketTimestamps: Market_market_marketTimestamps;
   /**
-   * Candles on a market, for the 'last' n candles, at 'interval' seconds as specified by parameters
+   * Candles on a market, for the 'last' n candles, at 'interval' seconds as specified by parameters using cursor based pagination
    */
-  candles: (Market_market_candles | null)[] | null;
+  candlesConnection: Market_market_candlesConnection | null;
 }
 
 export interface Market {

@@ -1,5 +1,5 @@
 fragment CandleFields on Candle {
-  datetime
+  timestamp
   high
   low
   open
@@ -24,7 +24,7 @@ query Candles($marketId: ID!, $interval: Interval!, $since: String!) {
   }
 }
 
-subscription CandlesSub($marketId: ID!, $interval: Interval!) {
+subscription CandlesEvents($marketId: ID!, $interval: Interval!) {
   candles(marketId: $marketId, interval: $interval) {
     ...CandleFields
   }

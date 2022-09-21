@@ -1,14 +1,16 @@
 import merge from 'lodash/merge';
 import type { PartialDeep } from 'type-fest';
 import type {
-  Candles,
-  Candles_market_candles,
+  CandlesQuery,
+  CandleFieldsFragment,
 } from '@vegaprotocol/candles-chart';
 
-export const generateCandles = (override?: PartialDeep<Candles>): Candles => {
-  const candles: Candles_market_candles[] = [
+export const generateCandles = (
+  override?: PartialDeep<CandlesQuery>
+): CandlesQuery => {
+  const candles: CandleFieldsFragment[] = [
     {
-      datetime: '2022-04-06T09:15:00Z',
+      timestamp: '1661515200000000000',
       high: '17481092',
       low: '17403651',
       open: '17458833',
@@ -17,7 +19,7 @@ export const generateCandles = (override?: PartialDeep<Candles>): Candles => {
       __typename: 'Candle',
     },
     {
-      datetime: '2022-04-06T09:30:00Z',
+      timestamp: '1661516100000000000',
       high: '17491202',
       low: '17361138',
       open: '17446470',
@@ -26,7 +28,7 @@ export const generateCandles = (override?: PartialDeep<Candles>): Candles => {
       __typename: 'Candle',
     },
     {
-      datetime: '2022-04-06T09:45:00Z',
+      timestamp: '1661517000000000000',
       high: '17424522',
       low: '17337719',
       open: '17367174',
@@ -35,7 +37,7 @@ export const generateCandles = (override?: PartialDeep<Candles>): Candles => {
       __typename: 'Candle',
     },
   ];
-  const defaultResult = {
+  const defaultResult: CandlesQuery = {
     market: {
       id: 'market-0',
       decimalPlaces: 5,

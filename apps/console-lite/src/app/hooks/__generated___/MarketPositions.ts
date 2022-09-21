@@ -1,4 +1,4 @@
-import * as Types from '@vegaprotocol/types/types';
+import { Schema as Types } from '@vegaprotocol/types';
 
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
@@ -8,7 +8,7 @@ export type MarketPositionsQueryVariables = Types.Exact<{
 }>;
 
 
-export type MarketPositionsQuery = { __typename?: 'Query', party?: { __typename?: 'Party', id: string, accounts?: Array<{ __typename?: 'Account', type: Types.AccountType, balance: string, asset: { __typename?: 'Asset', decimals: number }, market?: { __typename?: 'Market', id: string } | null }> | null, positionsConnection: { __typename?: 'PositionConnection', edges?: Array<{ __typename?: 'PositionEdge', node: { __typename?: 'Position', openVolume: string, market: { __typename?: 'Market', id: string } } }> | null } } | null };
+export type MarketPositionsQuery = { __typename?: 'Query', party?: { __typename?: 'Party', id: string, accounts?: Array<{ __typename?: 'Account', type: Types.AccountType, balance: string, asset: { __typename?: 'Asset', decimals: number }, market?: { __typename?: 'Market', id: string } | null }> | null, positionsConnection?: { __typename?: 'PositionConnection', edges?: Array<{ __typename?: 'PositionEdge', node: { __typename?: 'Position', openVolume: string, market: { __typename?: 'Market', id: string } } }> | null } | null } | null };
 
 
 export const MarketPositionsDocument = gql`

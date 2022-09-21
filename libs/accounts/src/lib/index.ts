@@ -1,6 +1,4 @@
-export * from './__generated__/Accounts';
-export * from './__generated__/AccountFields';
-export * from './__generated__/AccountSubscribe';
+export * from './__generated___/Accounts';
 export * from './accounts-container';
 export * from './accounts-data-provider';
 export * from './accounts-manager';

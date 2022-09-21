@@ -1,90 +1,68 @@
 import produce from 'immer';
-import { gql } from '@apollo/client';
+import type { IterableElement } from 'type-fest';
+import {
+  AccountsDocument,
+  AccountEventsDocument,
+} from './__generated___/Accounts';
 import type {
-  Accounts,
-  Accounts_party_accounts,
-} from './__generated__/Accounts';
+  AccountFieldsFragment,
+  AccountsQuery,
+  AccountEventsSubscription,
+} from './__generated___/Accounts';
 import { makeDataProvider } from '@vegaprotocol/react-helpers';
 
-import type {
-  AccountSubscribe,
-  AccountSubscribe_accounts,
-} from './__generated__/AccountSubscribe';
-
-const ACCOUNTS_FRAGMENT = gql`
-  fragment AccountFields on Account {
-    type
-    balance
-    market {
-      id
-      tradableInstrument {
-        instrument {
-          name
-        }
-      }
-    }
-    asset {
-      id
-      symbol
-      decimals
-    }
-  }
-`;
-
-const ACCOUNTS_QUERY = gql`
-  ${ACCOUNTS_FRAGMENT}
-  query Accounts($partyId: ID!) {
-    party(id: $partyId) {
-      id
-      accounts {
-        ...AccountFields
-      }
-    }
-  }
-`;
-
-export const ACCOUNTS_SUB = gql`
-  ${ACCOUNTS_FRAGMENT}
-  subscription AccountSubscribe($partyId: ID!) {
-    accounts(partyId: $partyId) {
-      ...AccountFields
-    }
-  }
-`;
+function isAccount(
+  account:
+    | AccountFieldsFragment
+    | IterableElement<AccountEventsSubscription['accounts']>
+): account is AccountFieldsFragment {
+  return (account as AccountFieldsFragment).__typename === 'Account';
+}
 
 export const getId = (
-  data: Accounts_party_accounts | AccountSubscribe_accounts
-) => `${data.type}-${data.asset.symbol}-${data.market?.id ?? 'null'}`;
+  account:
+    | AccountFieldsFragment
+    | IterableElement<AccountEventsSubscription['accounts']>
+) =>
+  isAccount(account)
+    ? `${account.type}-${account.asset.id}-${account.market?.id ?? 'null'}`
+    : `${account.type}-${account.assetId}-${account.marketId}`;
 
 const update = (
-  data: Accounts_party_accounts[],
-  delta: AccountSubscribe_accounts
+  data: AccountFieldsFragment[],
+  deltas: AccountEventsSubscription['accounts']
 ) => {
   return produce(data, (draft) => {
-    const id = getId(delta);
-    const index = draft.findIndex((a) => getId(a) === id);
-    if (index !== -1) {
-      draft[index] = delta;
-    } else {
-      draft.push(delta);
-    }
+    deltas.forEach((delta) => {
+      const id = getId(delta);
+      const index = draft.findIndex((a) => getId(a) === id);
+      if (index !== -1) {
+        draft[index].balance = delta.balance;
+      } else {
+        // #TODO handle new account
+      }
+    });
   });
 };
 
-const getData = (responseData: Accounts): Accounts_party_accounts[] | null =>
-  responseData.party ? responseData.party.accounts : null;
+const getData = (
+  responseData: AccountsQuery
+): AccountFieldsFragment[] | null => {
+  return responseData.party?.accounts ?? null;
+};
+
 const getDelta = (
-  subscriptionData: AccountSubscribe
-): AccountSubscribe_accounts => subscriptionData.accounts;
+  subscriptionData: AccountEventsSubscription
+): AccountEventsSubscription['accounts'] => subscriptionData.accounts;
 
 export const accountsDataProvider = makeDataProvider<
-  Accounts,
-  Accounts_party_accounts[],
-  AccountSubscribe,
-  AccountSubscribe_accounts
+  AccountsQuery,
+  AccountFieldsFragment[],
+  AccountEventsSubscription,
+  AccountEventsSubscription['accounts']
 >({
-  query: ACCOUNTS_QUERY,
-  subscriptionQuery: ACCOUNTS_SUB,
+  query: AccountsDocument,
+  subscriptionQuery: AccountEventsDocument,
   update,
   getData,
   getDelta,

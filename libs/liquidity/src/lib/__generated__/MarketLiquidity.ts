@@ -46,7 +46,7 @@ export interface MarketLiquidity_market_liquidityProvisionsConnection_edges_node
   /**
    * Collateral accounts relating to a party
    */
-  accountsConnection: MarketLiquidity_market_liquidityProvisionsConnection_edges_node_party_accountsConnection;
+  accountsConnection: MarketLiquidity_market_liquidityProvisionsConnection_edges_node_party_accountsConnection | null;
 }
 
 export interface MarketLiquidity_market_liquidityProvisionsConnection_edges_node {
@@ -56,7 +56,7 @@ export interface MarketLiquidity_market_liquidityProvisionsConnection_edges_node
    */
   id: string | null;
   /**
-   * The Id of the party making this commitment
+   * The party making this commitment
    */
   party: MarketLiquidity_market_liquidityProvisionsConnection_edges_node_party;
   /**
@@ -72,7 +72,7 @@ export interface MarketLiquidity_market_liquidityProvisionsConnection_edges_node
    */
   commitmentAmount: string;
   /**
-   * Nominated liquidity fee factor, which is an input to the calculation of maker fees on the market, as per setting fees and rewarding liquidity providers.
+   * Nominated liquidity fee factor, which is an input to the calculation of liquidity fees on the market, as per setting fees and rewarding liquidity providers.
    */
   fee: string;
   /**
@@ -122,6 +122,10 @@ export interface MarketLiquidity_market_tradableInstrument_instrument {
    */
   code: string;
   /**
+   * Full and fairly descriptive name for the instrument
+   */
+  name: string;
+  /**
    * A reference to or instance of a fully specified product, including all required product parameters for that product (Product union)
    */
   product: MarketLiquidity_market_tradableInstrument_instrument_product;
@@ -170,7 +174,7 @@ export interface MarketLiquidity_market_data_liquidityProviderFeeShare {
 export interface MarketLiquidity_market_data {
   __typename: "MarketData";
   /**
-   * market ID of the associated mark price
+   * market of the associated mark price
    */
   market: MarketLiquidity_market_data_market;
   /**
@@ -228,7 +232,7 @@ export interface MarketLiquidity_market {
   /**
    * The list of the liquidity provision commitments for this market
    */
-  liquidityProvisionsConnection: MarketLiquidity_market_liquidityProvisionsConnection;
+  liquidityProvisionsConnection: MarketLiquidity_market_liquidityProvisionsConnection | null;
   /**
    * An instance of, or reference to, a tradable instrument.
    */
@@ -248,5 +252,5 @@ export interface MarketLiquidity {
 
 export interface MarketLiquidityVariables {
   marketId: string;
-  partyId?: string | null;
+  partyId: string;
 }

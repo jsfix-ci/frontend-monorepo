@@ -44,7 +44,8 @@ module.exports = defineConfig({
     collateralBridgeAddress: '0x9708FF7510D4A7B9541e1699d15b53Ecb1AFDc54',
     assetEthId: '0x67175Da1D5e966e40D11c4B2519392B2058373de',
     txTimeout: { timeout: 70000 },
-    epochTimeout: { timeout: 11000 },
+    epochTimeout: { timeout: 6000 },
     blockConfirmations: 3,
+    CYPRESS_TEARDOWN_NETWORK_AFTER_FLOWS: true,
   },
 });

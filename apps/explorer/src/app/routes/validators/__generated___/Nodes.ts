@@ -1,4 +1,4 @@
-import * as Types from '@vegaprotocol/types/types';
+import { Schema as Types } from '@vegaprotocol/types';
 
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
@@ -30,7 +30,6 @@ export const NodesQueryDocument = gql`
       online
     }
     status
-    name
   }
 }
     `;
