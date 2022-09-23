@@ -23,7 +23,9 @@ context('Rewards Tab - with eth and vega wallets connected', function () {
     cy.vega_wallet_send_asset_to_reward_pool('fUSDC', '5');
 
     cy.get_asset_information().then((assets) => {
-      cy.wrap(parseInt(assets['USDC (fake)'].rewardPoolBalance)).as('fusdc_reward_pool_balance');
+      cy.wrap(parseInt(assets['USDC (fake)'].rewardPoolBalance)).as(
+        'fusdc_reward_pool_balance'
+      );
     });
   });
 

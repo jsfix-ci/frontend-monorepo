@@ -16,7 +16,6 @@ const ethStakingBridgeContractAddress = Cypress.env(
   'ethStakingBridgeContractAddress'
 );
 
-
 const ethProviderUrl = Cypress.env('ethProviderUrl');
 const getAccount = (number = 0) => `m/44'/60'/0'/0/${number}`;
 const transactionTimeout = '90000';
