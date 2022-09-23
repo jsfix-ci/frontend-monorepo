@@ -16,15 +16,14 @@ context('Rewards Tab - with eth and vega wallets connected', function () {
     cy.verify_page_header('The $VEGA token');
     cy.vega_wallet_connect();
     cy.ethereum_wallet_connect();
-    cy.vega_wallet_top_up_with_real_vega_tokens('1');
-    cy.pause();
+    cy.vega_wallet_top_up_with_asset('USDC (fake)', '1');
     cy.navigate_to('staking');
     cy.wait_for_spinner();
     cy.wait_for_begining_of_epoch();
-    cy.vega_wallet_send_to_reward_pool('Vega', '50');
+    cy.vega_wallet_send_asset_to_reward_pool('fUSDC', '5');
 
-    cy.get_global_reward_pool_info().then((rewards) => {
-      cy.wrap(parseInt(rewards['Vega'].balance)).as('vega_reward_pool_balance');
+    cy.get_asset_information().then((assets) => {
+      cy.wrap(parseInt(assets['USDC (fake)'].rewardPoolBalance)).as('fusdc_reward_pool_balance');
     });
   });
 
@@ -33,7 +32,7 @@ context('Rewards Tab - with eth and vega wallets connected', function () {
       'Check network has enough vega tokens in reward pool - to test',
       function () {
         assert.isAtLeast(
-          this.vega_reward_pool_balance,
+          this.fusdc_reward_pool_balance,
           0.00001,
           'Asserting that the Vega reward pool has at least 1 token'
         );

@@ -1,5 +1,4 @@
 import {
-  CollateralBridge,
   StakingBridge,
   Token,
   TokenVesting,
@@ -7,19 +6,17 @@ import {
 import { ethers, Wallet } from 'ethers';
 
 const vegaWalletContainer = '[data-testid="vega-wallet"]';
-const vegaWalletAssociatedBalance = '[data-testid="currency-value"]';
+const vegaWalletBalances = '[data-testid="currency-value"]';
 const vegaWalletMnemonic = Cypress.env('vegaWalletMnemonic');
 const vegaWalletPubKey = Cypress.env('vegaWalletPublicKey');
 const vegaTokenContractAddress = Cypress.env('vegaTokenContractAddress');
 const vegaTokenAddress = Cypress.env('vegaTokenAddress');
-const collateralBridgeAddress = Cypress.env('collateralBridgeAddress');
 const ethWalletPubKey = Cypress.env('ethWalletPublicKey');
-
 const ethStakingBridgeContractAddress = Cypress.env(
   'ethStakingBridgeContractAddress'
 );
 
-const assetEthId = Cypress.env('assetEthId');
+
 const ethProviderUrl = Cypress.env('ethProviderUrl');
 const getAccount = (number = 0) => `m/44'/60'/0'/0/${number}`;
 const transactionTimeout = '90000';
@@ -47,7 +44,7 @@ before('Vega wallet teardown prep', function () {
 
 Cypress.Commands.add('vega_wallet_teardown', function () {
   cy.get(vegaWalletContainer).within(() => {
-    cy.get(vegaWalletAssociatedBalance)
+    cy.get(vegaWalletBalances)
       .invoke('text')
       .then((balance) => {
         if (balance != '0.000000000000000000') {
@@ -58,7 +55,7 @@ Cypress.Commands.add('vega_wallet_teardown', function () {
   });
 
   cy.get(vegaWalletContainer).within(() => {
-    cy.get(vegaWalletAssociatedBalance, { timeout: transactionTimeout }).should(
+    cy.get(vegaWalletBalances, { timeout: transactionTimeout }).should(
       'contain',
       '0.000000000000000000',
       { timeout: transactionTimeout }
@@ -125,37 +122,6 @@ Cypress.Commands.add('vega_wallet_teardown_vesting', (vestingContract) => {
     }
   });
 });
-
-Cypress.Commands.add(
-  'vega_wallet_top_up_with_real_vega_tokens',
-  function (resetAmount) {
-    cy.highlight(
-      `Topping up vega wallet with real vega, amount: ${resetAmount}`
-    );
-
-    cy.log('collateralBridgeAddress: ' + collateralBridgeAddress);
-    cy.wrap(new CollateralBridge(collateralBridgeAddress, this.signer), {
-      log: false,
-    }).then((collateralBridge) => {
-      cy.log('assetEthId: ' + assetEthId);
-      cy.log('resetAmount: ' + resetAmount);
-      cy.log('vegaWalletPubKey: 0x' + vegaWalletPubKey);
-      cy.wrap(
-        collateralBridge.deposit_asset(
-          assetEthId, // gotcha, got to put 0x at the front
-          resetAmount,
-          '0x' + vegaWalletPubKey
-        ),
-        {
-          timeout: transactionTimeout,
-          log: false,
-        }
-      ).then((tx) => {
-        cy.wait_for_transaction(tx);
-      });
-    });
-  }
-);
 
 Cypress.Commands.add('wait_for_transaction', (tx) => {
   cy.wrap(tx.wait(1).catch(cy.log), { timeout: transactionTimeout });

@@ -30,7 +30,7 @@ Cypress.Commands.add('verify_tab_highlighted', (page) => {
 });
 
 Cypress.Commands.add('verify_page_header', (text) => {
-  return cy.get('header h1').should('be.visible').and('have.text', text);
+  return cy.get('header h1', { timeout: 10000 }).should('be.visible').and('have.text', text);
 });
 
 Cypress.Commands.add('wait_for_spinner', () => {
