@@ -1,8 +1,8 @@
 import * as React from 'react';
 import type { AgGridReactProps, AgReactUiProps } from 'ag-grid-react';
 import { AgGridReact } from 'ag-grid-react';
-import { ThemeContext } from '@vegaprotocol/react-helpers';
 import 'ag-grid-community/dist/styles/ag-grid.css';
+import { useTheme } from '@vegaprotocol/react-helpers';
 
 const AgGridLightTheme = React.lazy(() =>
   import('./ag-grid-light').then((module) => ({
@@ -23,7 +23,7 @@ export const AgGridThemed = React.forwardRef<
     className?: string;
   }
 >(({ style, className, ...props }, ref) => {
-  const theme = React.useContext(ThemeContext);
+  const { theme } = useTheme();
   return (
     <div
       className={`${className ?? ''} ${

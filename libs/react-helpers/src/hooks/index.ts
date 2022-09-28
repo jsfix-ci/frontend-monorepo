@@ -5,4 +5,5 @@ export * from './use-network-params';
 export * from './use-outside-click';
 export * from './use-resize';
 export * from './use-screen-dimensions';
-export * from './use-theme-switcher';
+export * from './use-theme';
+export * from './use-theme-watcher';

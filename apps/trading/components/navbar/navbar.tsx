@@ -8,12 +8,7 @@ import { VegaWalletConnectButton } from '../vega-wallet-connect-button';
 import { ThemeSwitcher } from '@vegaprotocol/ui-toolkit';
 import { Vega } from '../icons/vega';
 
-interface NavbarProps {
-  theme: 'light' | 'dark';
-  toggleTheme: () => void;
-}
-
-export const Navbar = ({ theme, toggleTheme }: NavbarProps) => {
+export const Navbar = () => {
   const { marketId, update } = useGlobalStore((store) => ({
     marketId: store.marketId,
     update: store.update,
@@ -43,7 +38,7 @@ export const Navbar = ({ theme, toggleTheme }: NavbarProps) => {
         ))}
       </nav>
       <div className="flex items-center gap-2 ml-auto">
-        <ThemeSwitcher theme={theme} onToggle={toggleTheme} />
+        <ThemeSwitcher />
         <VegaWalletConnectButton
           setConnectDialog={(open) => update({ connectDialog: open })}
         />

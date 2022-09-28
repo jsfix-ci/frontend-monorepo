@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import create from 'zustand';
 import { LocalStorage } from '../lib/storage';
 
 type ThemeVariant = typeof darkTheme | typeof lightTheme;
@@ -28,21 +29,35 @@ const applyClass = (theme: ThemeVariant) => {
   }
 };
 
-export function useThemeSwitcher(): [ThemeVariant, () => void] {
-  const [theme, setTheme] = useState<ThemeVariant>(lightTheme);
-  useEffect(() => setTheme(getCurrentTheme()), []);
+interface ThemeStore {
+  theme: ThemeVariant;
+  toggle: (theme?: ThemeVariant) => void;
+}
+
+export const useThemeStore = create<ThemeStore>((set) => ({
+  theme: lightTheme,
+  toggle: (theme) => {
+    set((curr) => {
+      let newTheme: ThemeVariant;
+      if (theme) {
+        newTheme = theme;
+      } else {
+        newTheme = curr.theme === lightTheme ? darkTheme : lightTheme;
+      }
+      LocalStorage.setItem(storageKey, newTheme);
+      applyClass(newTheme);
+      return { theme: newTheme };
+    });
+  },
+}));
+
+export function useTheme() {
+  const { theme, toggle } = useThemeStore();
+
   useEffect(() => {
     const storedTheme = getCurrentTheme();
-    applyClass(storedTheme);
-    setTheme(storedTheme);
-  }, []);
+    toggle(storedTheme);
+  }, [toggle]);
 
-  const toggle = useCallback(() => {
-    const newTheme = theme === darkTheme ? lightTheme : darkTheme;
-    LocalStorage.setItem(storageKey, newTheme);
-    applyClass(newTheme);
-    setTheme(newTheme);
-  }, [theme]);
-
-  return [theme, toggle];
+  return { theme, toggle };
 }

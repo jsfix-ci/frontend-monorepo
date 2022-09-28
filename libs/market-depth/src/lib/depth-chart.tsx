@@ -4,18 +4,11 @@ import { AsyncRenderer } from '@vegaprotocol/ui-toolkit';
 import {
   useDataProvider,
   addDecimal,
-  ThemeContext,
   getNumberFormat,
+  useTheme,
 } from '@vegaprotocol/react-helpers';
 import dataProvider from './market-depth-provider';
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  useContext,
-} from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { marketDataProvider, marketProvider } from '@vegaprotocol/market-list';
 import type { MarketData } from '@vegaprotocol/market-list';
 import type {
@@ -36,7 +29,7 @@ const formatMidPrice = (midPrice: string, decimalPlaces: number) =>
 type DepthData = Pick<DepthChartProps, 'data' | 'midPrice'>;
 
 export const DepthChartContainer = ({ marketId }: DepthChartManagerProps) => {
-  const theme = useContext(ThemeContext);
+  const { theme } = useTheme();
   const variables = useMemo(() => ({ marketId }), [marketId]);
   const [depthData, setDepthData] = useState<DepthData | null>(null);
   const dataRef = useRef<DepthData | null>(null);

@@ -1,7 +1,7 @@
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import { Navbar } from '../components/navbar';
-import { t, ThemeContext, useThemeSwitcher } from '@vegaprotocol/react-helpers';
+import { t } from '@vegaprotocol/react-helpers';
 import { VegaConnectDialog, VegaWalletProvider } from '@vegaprotocol/wallet';
 import {
   EnvironmentProvider,
@@ -29,7 +29,6 @@ function AppBody({ Component, pageProps }: AppProps) {
     update: store.update,
   }));
   const { isOpen, symbol, trigger, setOpen } = useAssetDetailsDialogStore();
-  const [theme, toggleTheme] = useThemeSwitcher();
 
   const { VEGA_ENV } = useEnvironment();
   const networkName = envTriggerMapping[VEGA_ENV];
@@ -41,13 +40,13 @@ function AppBody({ Component, pageProps }: AppProps) {
   }, [pageTitle, networkName]);
 
   return (
-    <ThemeContext.Provider value={theme}>
+    <>
       <Head>
         <title>{title}</title>
       </Head>
       <div className="h-full relative dark:bg-black dark:text-white z-0 grid grid-rows-[min-content,1fr,min-content]">
         <AppLoader>
-          <Navbar theme={theme} toggleTheme={toggleTheme} />
+          <Navbar />
           <main data-testid={pageProps.page}>
             {/* @ts-ignore conflict between @types/react and nextjs internal types */}
             <Component {...pageProps} />
@@ -67,7 +66,7 @@ function AppBody({ Component, pageProps }: AppProps) {
           <RiskNoticeDialog />
         </AppLoader>
       </div>
-    </ThemeContext.Provider>
+    </>
   );
 }
 

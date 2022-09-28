@@ -8,11 +8,10 @@ import {
   useState,
   useMemo,
   useCallback,
-  useContext,
 } from 'react';
 import classNames from 'classnames';
 
-import { formatNumber, t, ThemeContext } from '@vegaprotocol/react-helpers';
+import { formatNumber, t, useTheme } from '@vegaprotocol/react-helpers';
 import { MarketTradingMode } from '@vegaprotocol/types';
 import { OrderbookRow } from './orderbook-row';
 import { createRow, getPriceLevel } from './orderbook-data';
@@ -107,7 +106,7 @@ export const Orderbook = ({
   resolution,
   onResolutionChange,
 }: OrderbookProps) => {
-  const theme = useContext(ThemeContext);
+  const { theme } = useTheme();
   const scrollElement = useRef<HTMLDivElement>(null);
   // scroll offset for which rendered rows are selected, will change after user will scroll to margin of rendered data
   const [scrollOffset, setScrollOffset] = useState(0);

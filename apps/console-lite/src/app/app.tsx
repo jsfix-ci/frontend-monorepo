@@ -1,8 +1,6 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { createClient } from './lib/apollo-client';
-import { ThemeContext } from '@vegaprotocol/react-helpers';
-import { useThemeSwitcher } from '@vegaprotocol/react-helpers';
 import { EnvironmentProvider, NetworkLoader } from '@vegaprotocol/environment';
 import {
   VegaConnectDialog,
@@ -18,8 +16,7 @@ import LocalContext from './context/local-context';
 import useLocalValues from './hooks/use-local-values';
 
 function App() {
-  const [theme, toggleTheme] = useThemeSwitcher();
-  const localValues = useLocalValues(theme, toggleTheme);
+  const localValues = useLocalValues();
   const {
     vegaWalletDialog,
     menu: { setMenuOpen },
@@ -32,29 +29,27 @@ function App() {
 
   return (
     <EnvironmentProvider>
-      <ThemeContext.Provider value={theme}>
-        <NetworkLoader createClient={createClient}>
-          <VegaWalletProvider>
-            <LocalContext.Provider value={localValues}>
-              <AppLoader>
-                <div className="max-h-full min-h-full dark:bg-lite-black dark:text-neutral-200 bg-white text-neutral-800 grid grid-rows-[min-content,1fr]">
-                  <Header />
-                  <Main />
-                  <VegaConnectDialog
-                    connectors={Connectors}
-                    dialogOpen={vegaWalletDialog.connect}
-                    setDialogOpen={vegaWalletDialog.setConnect}
-                  />
-                  <VegaManageDialog
-                    dialogOpen={vegaWalletDialog.manage}
-                    setDialogOpen={vegaWalletDialog.setManage}
-                  />
-                </div>
-              </AppLoader>
-            </LocalContext.Provider>
-          </VegaWalletProvider>
-        </NetworkLoader>
-      </ThemeContext.Provider>
+      <NetworkLoader createClient={createClient}>
+        <VegaWalletProvider>
+          <LocalContext.Provider value={localValues}>
+            <AppLoader>
+              <div className="max-h-full min-h-full dark:bg-lite-black dark:text-neutral-200 bg-white text-neutral-800 grid grid-rows-[min-content,1fr]">
+                <Header />
+                <Main />
+                <VegaConnectDialog
+                  connectors={Connectors}
+                  dialogOpen={vegaWalletDialog.connect}
+                  setDialogOpen={vegaWalletDialog.setConnect}
+                />
+                <VegaManageDialog
+                  dialogOpen={vegaWalletDialog.manage}
+                  setDialogOpen={vegaWalletDialog.setManage}
+                />
+              </div>
+            </AppLoader>
+          </LocalContext.Provider>
+        </VegaWalletProvider>
+      </NetworkLoader>
     </EnvironmentProvider>
   );
 }

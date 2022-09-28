@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import * as Sentry from '@sentry/react';
 import { BrowserTracing } from '@sentry/tracing';
 import { useLocation } from 'react-router-dom';
-import { ThemeContext, useThemeSwitcher } from '@vegaprotocol/react-helpers';
 import {
   EnvironmentProvider,
   NetworkLoader,
@@ -18,7 +17,6 @@ import { ENV } from './config/env';
 
 function App() {
   const { VEGA_ENV } = useEnvironment();
-  const [theme, toggleTheme] = useThemeSwitcher();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const location = useLocation();
@@ -37,31 +35,24 @@ function App() {
   }, [VEGA_ENV]);
 
   return (
-    <ThemeContext.Provider value={theme}>
-      <TendermintWebsocketProvider>
-        <NetworkLoader createClient={createClient}>
-          <div
-            className={`${
-              menuOpen && 'h-[100vh] overflow-hidden'
-            } antialiased m-0 bg-white dark:bg-black text-black dark:text-white`}
-          >
-            <div className="grid grid-rows-[repeat(2,_auto)_1fr] grid-cols-[1fr] md:grid-rows-[auto_minmax(700px,_1fr)] md:grid-cols-[300px_1fr] border-neutral-700 dark:border-neutral-300 lg:border-l lg:border-r mx-auto">
-              <Header
-                theme={theme}
-                toggleTheme={toggleTheme}
-                menuOpen={menuOpen}
-                setMenuOpen={setMenuOpen}
-              />
-              <Nav menuOpen={menuOpen} />
-              <Main />
-              <footer className="grid grid-rows-2 grid-cols-[1fr_auto] text-sm md:text-md md:flex md:col-span-2 p-4 gap-4 border-t border-neutral-700 dark:border-neutral-300">
-                <NetworkInfo />
-              </footer>
-            </div>
+    <TendermintWebsocketProvider>
+      <NetworkLoader createClient={createClient}>
+        <div
+          className={`${
+            menuOpen && 'h-[100vh] overflow-hidden'
+          } antialiased m-0 bg-white dark:bg-black text-black dark:text-white`}
+        >
+          <div className="grid grid-rows-[repeat(2,_auto)_1fr] grid-cols-[1fr] md:grid-rows-[auto_minmax(700px,_1fr)] md:grid-cols-[300px_1fr] border-neutral-700 dark:border-neutral-300 lg:border-l lg:border-r mx-auto">
+            <Header menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
+            <Nav menuOpen={menuOpen} />
+            <Main />
+            <footer className="grid grid-rows-2 grid-cols-[1fr_auto] text-sm md:text-md md:flex md:col-span-2 p-4 gap-4 border-t border-neutral-700 dark:border-neutral-300">
+              <NetworkInfo />
+            </footer>
           </div>
-        </NetworkLoader>
-      </TendermintWebsocketProvider>
-    </ThemeContext.Provider>
+        </div>
+      </NetworkLoader>
+    </TendermintWebsocketProvider>
   );
 }
 
