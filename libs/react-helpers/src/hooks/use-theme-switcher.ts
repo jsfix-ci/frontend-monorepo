@@ -1,14 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { LocalStorage } from '../lib/storage';
+
+type ThemeVariant = typeof darkTheme | typeof lightTheme;
 
 const darkTheme = 'dark';
 const lightTheme = 'light';
-type themeVariant = typeof darkTheme | typeof lightTheme;
-
-const darkThemeCssClass = darkTheme;
+const storageKey = 'theme';
 
 const getCurrentTheme = () => {
-  const theme = LocalStorage.getItem('theme');
+  const theme = LocalStorage.getItem(storageKey);
   if (
     theme === darkTheme ||
     (!theme &&
@@ -20,23 +20,29 @@ const getCurrentTheme = () => {
   return lightTheme;
 };
 
-const toggleTheme = () => {
-  const theme = document.documentElement.classList.contains(darkThemeCssClass)
-    ? lightTheme
-    : darkTheme;
-  LocalStorage.setItem('theme', theme);
-  return theme;
+const applyClass = (theme: ThemeVariant) => {
+  if (theme === darkTheme) {
+    document.documentElement.classList.add(darkTheme);
+  } else {
+    document.documentElement.classList.remove(darkTheme);
+  }
 };
 
-export function useThemeSwitcher(): [themeVariant, () => void] {
-  const [theme, setTheme] = useState<themeVariant>(lightTheme);
+export function useThemeSwitcher(): [ThemeVariant, () => void] {
+  const [theme, setTheme] = useState<ThemeVariant>(lightTheme);
   useEffect(() => setTheme(getCurrentTheme()), []);
   useEffect(() => {
-    if (theme === darkTheme) {
-      document.documentElement.classList.add(darkThemeCssClass);
-    } else {
-      document.documentElement.classList.remove(darkThemeCssClass);
-    }
+    const storedTheme = getCurrentTheme();
+    applyClass(storedTheme);
+    setTheme(storedTheme);
+  }, []);
+
+  const toggle = useCallback(() => {
+    const newTheme = theme === darkTheme ? lightTheme : darkTheme;
+    LocalStorage.setItem(storageKey, newTheme);
+    applyClass(newTheme);
+    setTheme(newTheme);
   }, [theme]);
-  return [theme, () => setTheme(toggleTheme)];
+
+  return [theme, toggle];
 }
