@@ -425,10 +425,7 @@
   "associatedWithVegaKeys": "Associated with Vega keys",
   "thisEpoch": "This Epoch",
   "nextEpoch": "Next epoch",
-  "rewardsPara1": "Rewards are paid out from the treasury at the end of an epoch.",
-  "rewardsPara2": "This page lists all the rewards that your Vega key has received.",
-  "rewardsPara3": "This delay is set by a network parameter",
-  "rewardsCallout": "Rewards are credited {{duration}} after the epoch ends.",
+  "rewardsPara": "Rewards will be paid out from the treasury {{duration}} after the end of an epoch.",
   "noRewards": "The Vega key has not been credited any rewards since the previous network checkpoint.",
   "rewardType": "Reward type",
   "yourStake": "Your stake",
@@ -694,5 +691,6 @@
   "FreeformProposal": "Freeform proposal",
   "unknownReason": "unknown reason",
   "votingEnded": "Voting has ended.",
-  "STATUS": "STATUS"
+  "STATUS": "STATUS",
+  "immediately": "immediately"
 }

@@ -3,46 +3,45 @@ import { Schema as Types } from '@vegaprotocol/types';
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 const defaultOptions = {} as const;
+export type RewardsFieldsFragment = { __typename?: 'RewardEdge', node: { __typename?: 'Reward', rewardType: Types.AccountType, amount: string, amountFormatted: string, percentageOfTotal: string, asset: { __typename?: 'Asset', id: string, symbol: string, name: string, decimals: number }, epoch: { __typename?: 'Epoch', id: string } } };
+
 export type RewardsQueryVariables = Types.Exact<{
   partyId: Types.Scalars['ID'];
 }>;
 
 
-export type RewardsQuery = { __typename?: 'Query', party?: { __typename?: 'Party', id: string, rewardDetails?: Array<{ __typename?: 'RewardPerAssetDetail', totalAmount: string, totalAmountFormatted: string, asset: { __typename?: 'Asset', id: string, symbol: string }, rewards?: Array<{ __typename?: 'Reward', rewardType: Types.AccountType, amount: string, amountFormatted: string, percentageOfTotal: string, receivedAt: string, asset: { __typename?: 'Asset', id: string }, party: { __typename?: 'Party', id: string }, epoch: { __typename?: 'Epoch', id: string } } | null> | null } | null> | null, delegations?: Array<{ __typename?: 'Delegation', amount: string, amountFormatted: string, epoch: number }> | null } | null, epoch: { __typename?: 'Epoch', id: string, timestamps: { __typename?: 'EpochTimestamps', start?: string | null, end?: string | null, expiry?: string | null } } };
+export type RewardsQuery = { __typename?: 'Query', party?: { __typename?: 'Party', id: string, rewardsConnection?: { __typename?: 'RewardsConnection', edges?: Array<{ __typename?: 'RewardEdge', node: { __typename?: 'Reward', rewardType: Types.AccountType, amount: string, amountFormatted: string, percentageOfTotal: string, asset: { __typename?: 'Asset', id: string, symbol: string, name: string, decimals: number }, epoch: { __typename?: 'Epoch', id: string } } } | null> | null } | null } | null, epoch: { __typename?: 'Epoch', id: string, timestamps: { __typename?: 'EpochTimestamps', start?: string | null, end?: string | null, expiry?: string | null } } };
 
-
+export const RewardsFieldsFragmentDoc = gql`
+    fragment RewardsFields on RewardEdge {
+  node {
+    asset {
+      id
+      symbol
+    }
+    rewardType
+    asset {
+      id
+      name
+      decimals
+    }
+    epoch {
+      id
+    }
+    amount
+    amountFormatted @client
+    percentageOfTotal
+  }
+}
+    `;
 export const RewardsDocument = gql`
     query Rewards($partyId: ID!) {
   party(id: $partyId) {
     id
-    rewardDetails {
-      asset {
-        id
-        symbol
+    rewardsConnection {
+      edges {
+        ...RewardsFields
       }
-      rewards {
-        rewardType
-        asset {
-          id
-        }
-        party {
-          id
-        }
-        epoch {
-          id
-        }
-        amount
-        amountFormatted @client
-        percentageOfTotal
-        receivedAt
-      }
-      totalAmount
-      totalAmountFormatted @client
-    }
-    delegations {
-      amount
-      amountFormatted @client
-      epoch
     }
   }
   epoch {
@@ -54,7 +53,7 @@ export const RewardsDocument = gql`
     }
   }
 }
-    `;
+    ${RewardsFieldsFragmentDoc}`;
 
 /**
  * __useRewardsQuery__

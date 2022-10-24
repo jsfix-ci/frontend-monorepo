@@ -1,19 +1,20 @@
-import * as Sentry from '@sentry/react';
-import { format } from 'date-fns';
-import React from 'react';
+import React, { forwardRef, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-
-import { KeyValueTable, KeyValueTableRow } from '@vegaprotocol/ui-toolkit';
+import { AgGridDynamic as AgGrid } from '@vegaprotocol/ui-toolkit';
 import { BigNumber } from '../../../lib/bignumber';
-import { DATE_FORMAT_DETAILED } from '../../../lib/date-formats';
 import type {
-  Rewards,
-  Rewards_party_delegations,
-  Rewards_party_rewardDetails_rewards,
-} from './__generated__/Rewards';
+  RewardsFieldsFragment,
+  RewardsQuery,
+} from './__generated___/Rewards';
+import type { AgGridReact } from 'ag-grid-react';
+import type { ColDef } from 'ag-grid-community';
+import compact from 'lodash/compact';
+import groupBy from 'lodash/groupBy';
+import { AccountType } from '@vegaprotocol/types';
+import { addDecimal, formatNumber } from '@vegaprotocol/react-helpers';
 
 interface RewardInfoProps {
-  data: Rewards | undefined;
+  data: RewardsQuery | undefined;
   currVegaKey: string;
   rewardAssetId: string;
 }
@@ -24,121 +25,119 @@ export const RewardInfo = ({
   rewardAssetId,
 }: RewardInfoProps) => {
   const { t } = useTranslation();
-
-  // Create array of rewards per epoch
-  const vegaTokenRewards = React.useMemo(() => {
-    if (!data?.party || !data.party.rewardDetails?.length) return [];
-
-    const vegaTokenRewards = data.party.rewardDetails.find(
-      (r) => r?.asset.id === rewardAssetId
-    );
-
-    // We only issue rewards as Vega tokens for now so there should only be one
-    // item in the rewardDetails array
-    if (!vegaTokenRewards) {
-      const rewardAssets = data.party.rewardDetails
-        .map((r) => r?.asset.symbol)
-        .join(', ');
-      Sentry.captureMessage(
-        `Could not find VEGA token rewards ${rewardAssets}`
-      );
-      return [];
-    }
-
-    if (!vegaTokenRewards?.rewards?.length) return [];
-
-    const sorted = Array.from(vegaTokenRewards.rewards).sort((a, b) => {
-      if (!a || !b) return 0;
-      if (a.epoch > b.epoch) return -1;
-      if (a.epoch < b.epoch) return 1;
-      return 0;
-    });
-
-    return sorted;
-  }, [data, rewardAssetId]);
-
+  if (!data?.party?.rewardsConnection?.edges?.length) {
+    return <p>{t('noRewards')}</p>;
+  }
+  const rewardsByEpoch = Object.entries(
+    groupBy(data?.party?.rewardsConnection?.edges, 'epoch.id')
+  );
   return (
     <div>
-      <p>
-        {t('Connected Vega key')}: {currVegaKey}
-      </p>
-      {vegaTokenRewards.length ? (
-        vegaTokenRewards.map((reward, i) => {
-          if (!reward) return null;
-          return (
-            <RewardTable
-              key={i}
-              reward={reward}
-              delegations={data?.party?.delegations || []}
-            />
-          );
-        })
-      ) : (
-        <p>{t('noRewards')}</p>
-      )}
+      {rewardsByEpoch.map(([epoch, reward]) => {
+        if (!reward) return null;
+        return <RewardTable key={epoch} reward={reward} epoch={epoch} />;
+      })}
     </div>
   );
 };
 
 interface RewardTableProps {
-  reward: Rewards_party_rewardDetails_rewards;
-  delegations: Rewards_party_delegations[];
+  reward: (RewardsFieldsFragment | null)[];
+  epoch: string;
 }
 
-export const RewardTable = ({ reward, delegations }: RewardTableProps) => {
-  const { t } = useTranslation();
-
-  // Get your stake for epoch in which you have rewards
-  const stakeForEpoch = React.useMemo(() => {
-    if (!delegations.length) return '0';
-
-    const delegationsForEpoch = delegations
-      .filter((d) => d.epoch.toString() === reward.epoch.id)
-      .map((d) => new BigNumber(d.amountFormatted));
-
-    if (delegationsForEpoch.length) {
-      return BigNumber.sum.apply(null, [
-        new BigNumber(0),
-        ...delegationsForEpoch,
-      ]);
-    }
-
-    return new BigNumber(0);
-  }, [delegations, reward.epoch]);
-
-  return (
-    <div className="mb-24">
-      <h3 className="text-lg text-white mb-4">
-        {t('Epoch')} {reward.epoch.id}
-      </h3>
-      <KeyValueTable>
-        <KeyValueTableRow>
-          {t('rewardType')}
-          <span>{reward.rewardType}</span>
-        </KeyValueTableRow>
-        <KeyValueTableRow>
-          {t('yourStake')}
-          <span>{stakeForEpoch.toString()}</span>
-        </KeyValueTableRow>
-        <KeyValueTableRow>
-          {t('reward')}
-          <span>
-            {reward.amountFormatted} {t('VEGA')}
-          </span>
-        </KeyValueTableRow>
-        <KeyValueTableRow>
-          {t('shareOfReward')}
-          <span>
-            {new BigNumber(reward.percentageOfTotal).dp(2).toString()}%
-          </span>
-        </KeyValueTableRow>
-        <KeyValueTableRow>
-          {t('received')}
-          <span>
-            {format(new Date(reward.receivedAt), DATE_FORMAT_DETAILED)}
-          </span>
-        </KeyValueTableRow>
-      </KeyValueTable>
-    </div>
+const getRewardsByTypes = (
+  rewards: RewardsFieldsFragment[],
+  types: AccountType[]
+) => {
+  const filteredResults = rewards.filter(({ node: { rewardType } }) =>
+    types.includes(rewardType)
   );
+  const total = filteredResults.reduce((acc, cur) => {
+    return acc.plus(addDecimal(cur.node.amount, cur.node.asset.decimals));
+  }, new BigNumber(0));
+  return formatNumber(total);
+};
+
+export const RewardTable = ({ reward, epoch }: RewardTableProps) => {
+  const { t } = useTranslation();
+  const compactRewards = groupBy(compact(reward), 'asset.name');
+  const rewardsByAssetAndType = Object.entries(compactRewards).map(
+    ([key, value]) => {
+      return {
+        assetName: key,
+        stakingRewards: getRewardsByTypes(value, [
+          AccountType.ACCOUNT_TYPE_GLOBAL_REWARD,
+          AccountType.ACCOUNT_TYPE_FEES_INFRASTRUCTURE,
+        ]),
+        priceTaking: getRewardsByTypes(value, [
+          AccountType.ACCOUNT_TYPE_REWARD_MAKER_PAID_FEES,
+        ]),
+        priceMaking: getRewardsByTypes(value, [
+          AccountType.ACCOUNT_TYPE_REWARD_MAKER_RECEIVED_FEES,
+        ]),
+        liquidityProvision: getRewardsByTypes(value, [
+          AccountType.ACCOUNT_TYPE_REWARD_LP_RECEIVED_FEES,
+        ]),
+        marketCreation: getRewardsByTypes(value, [
+          AccountType.ACCOUNT_TYPE_REWARD_MARKET_PROPOSERS,
+        ]),
+      };
+    }
+  );
+  const gridRef = useRef<AgGridReact | null>(null);
+
+  const AssetsTable = forwardRef<AgGridReact>((_, ref) => {
+    const colDefs = useMemo<ColDef[]>(
+      () => [
+        {
+          field: 'assetName',
+          headerName: t('Asset').toString(),
+        },
+        {
+          field: 'stakingRewards',
+          headerName: t('Staking').toString(),
+        },
+        {
+          field: 'priceTaking',
+          headerName: t('PriceTaking').toString(),
+        },
+        {
+          field: 'priceMaking',
+          headerName: t('PriceMaking').toString(),
+        },
+        {
+          field: 'liquidityProvision',
+          headerName: t('LiquidityProvision').toString(),
+        },
+        {
+          field: 'marketCreation',
+          headerName: t('MarketCreation').toString(),
+        },
+      ],
+      []
+    );
+
+    return (
+      <div className="mb-24">
+        <h3 className="text-lg text-white mb-4">
+          {t('Epoch')} {epoch}
+        </h3>
+        <AgGrid
+          domLayout="autoHeight"
+          style={{ width: '100%' }}
+          overlayNoRowsTemplate={t('noValidators')}
+          ref={ref}
+          rowData={rewardsByAssetAndType}
+          rowHeight={32}
+          columnDefs={colDefs}
+          // defaultColDef={defaultColDef}
+          animateRows={true}
+          suppressCellFocus={true}
+        />
+      </div>
+    );
+  });
+
+  return <AssetsTable ref={gridRef} />;
 };

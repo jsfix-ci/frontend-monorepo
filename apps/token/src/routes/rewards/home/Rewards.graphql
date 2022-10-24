@@ -1,34 +1,31 @@
+fragment RewardsFields on RewardEdge {
+  node {
+    asset {
+      id
+      symbol
+    }
+    rewardType
+    asset {
+      id
+      name
+      decimals
+    }
+    epoch {
+      id
+    }
+    amount
+    amountFormatted @client
+    percentageOfTotal
+  }
+}
+
 query Rewards($partyId: ID!) {
   party(id: $partyId) {
     id
-    rewardDetails {
-      asset {
-        id
-        symbol
+    rewardsConnection {
+      edges {
+        ...RewardsFields
       }
-      rewards {
-        rewardType
-        asset {
-          id
-        }
-        party {
-          id
-        }
-        epoch {
-          id
-        }
-        amount
-        amountFormatted @client
-        percentageOfTotal
-        receivedAt
-      }
-      totalAmount
-      totalAmountFormatted @client
-    }
-    delegations {
-      amount
-      amountFormatted @client
-      epoch
     }
   }
   epoch {

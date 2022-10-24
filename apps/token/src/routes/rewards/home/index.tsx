@@ -3,68 +3,23 @@ import { Callout, Intent, Splash } from '@vegaprotocol/ui-toolkit';
 import { formatDistance } from 'date-fns';
 // @ts-ignore No types available for duration-js
 import Duration from 'duration-js';
-import gql from 'graphql-tag';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { EpochCountdown } from '../../../components/epoch-countdown';
 import { Heading } from '../../../components/heading';
 import { SplashLoader } from '../../../components/splash-loader';
-import type { Rewards } from './__generated__/Rewards';
 import { RewardInfo } from './reward-info';
 import { useVegaWallet } from '@vegaprotocol/wallet';
 import { useNetworkParams, NetworkParams } from '@vegaprotocol/react-helpers';
 import { VegaWalletContainer } from '../../../components/vega-wallet-container';
-
-export const REWARDS_QUERY = gql`
-  query Rewards($partyId: ID!) {
-    party(id: $partyId) {
-      id
-      rewardDetails {
-        asset {
-          id
-          symbol
-        }
-        rewards {
-          rewardType
-          asset {
-            id
-          }
-          party {
-            id
-          }
-          epoch {
-            id
-          }
-          amount
-          amountFormatted @client
-          percentageOfTotal
-          receivedAt
-        }
-        totalAmount
-        totalAmountFormatted @client
-      }
-      delegations {
-        amount
-        amountFormatted @client
-        epoch
-      }
-    }
-    epoch {
-      id
-      timestamps {
-        start
-        end
-        expiry
-      }
-    }
-  }
-`;
+import { RewardsDocument } from './__generated___/Rewards';
+import type { RewardsQuery } from './__generated___/Rewards';
 
 export const RewardsIndex = () => {
   const { t } = useTranslation();
   const { pubKey } = useVegaWallet();
-  const { data, loading, error } = useQuery<Rewards>(REWARDS_QUERY, {
+  const { data, loading, error } = useQuery<RewardsQuery>(RewardsDocument, {
     variables: { partyId: pubKey },
     skip: !pubKey,
   });
@@ -102,21 +57,13 @@ export const RewardsIndex = () => {
   return (
     <section className="rewards">
       <Heading title={t('pageTitleRewards')} />
-      <p>{t('rewardsPara1')}</p>
-      <p>{t('rewardsPara2')}</p>
-      {payoutDuration ? (
-        <div className="my-8">
-          <Callout
-            title={t('rewardsCallout', {
-              duration: formatDistance(new Date(0), payoutDuration),
-            })}
-            headingLevel={3}
-            intent={Intent.Warning}
-          >
-            <p className="mb-0">{t('rewardsPara3')}</p>
-          </Callout>
-        </div>
-      ) : null}
+      <p>
+        {t('rewardsPara', {
+          duration: payoutDuration
+            ? formatDistance(new Date(0), payoutDuration)
+            : t('immediately'),
+        })}
+      </p>
       {!loading &&
         data &&
         !error &&
