@@ -141,8 +141,9 @@ export const ProposeNetworkParameter = () => {
       data={params}
     >
       <Heading title={t('NetworkParameterProposal')} />
-      <VegaWalletContainer>
-        {() => (
+      <VegaWalletContainer
+        // TODO why is this not using the pubkey argument?
+        render={() => (
           <>
             <ProposalMinRequirements
               minProposalBalance={
@@ -291,7 +292,7 @@ export const ProposeNetworkParameter = () => {
             </div>
           </>
         )}
-      </VegaWalletContainer>
+      />
     </AsyncRenderer>
   );
 };

@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client';
-import { Button, Callout, Intent, Splash } from '@vegaprotocol/ui-toolkit';
+import { Callout, Intent, Splash } from '@vegaprotocol/ui-toolkit';
 import { formatDistance } from 'date-fns';
 // @ts-ignore No types available for duration-js
 import Duration from 'duration-js';
@@ -10,14 +10,11 @@ import { useTranslation } from 'react-i18next';
 import { EpochCountdown } from '../../../components/epoch-countdown';
 import { Heading } from '../../../components/heading';
 import { SplashLoader } from '../../../components/splash-loader';
-import {
-  AppStateActionType,
-  useAppState,
-} from '../../../contexts/app-state/app-state-context';
 import type { Rewards } from './__generated__/Rewards';
 import { RewardInfo } from './reward-info';
-import { useVegaWallet, useVegaWalletDialogStore } from '@vegaprotocol/wallet';
+import { useVegaWallet } from '@vegaprotocol/wallet';
 import { useNetworkParams, NetworkParams } from '@vegaprotocol/react-helpers';
+import { VegaWalletContainer } from '../../../components/vega-wallet-container';
 
 export const REWARDS_QUERY = gql`
   query Rewards($partyId: ID!) {
@@ -66,11 +63,7 @@ export const REWARDS_QUERY = gql`
 
 export const RewardsIndex = () => {
   const { t } = useTranslation();
-  const { pubKey, pubKeys } = useVegaWallet();
-  const { openVegaWalletDialog } = useVegaWalletDialogStore((store) => ({
-    openVegaWalletDialog: store.openVegaWalletDialog,
-  }));
-  const { appDispatch } = useAppState();
+  const { pubKey } = useVegaWallet();
   const { data, loading, error } = useQuery<Rewards>(REWARDS_QUERY, {
     variables: { partyId: pubKey },
     skip: !pubKey,
@@ -140,28 +133,15 @@ export const RewardsIndex = () => {
           </section>
         )}
       <section>
-        {pubKey && pubKeys?.length ? (
-          <RewardInfo
-            currVegaKey={pubKey}
-            data={data}
-            rewardAssetId={params.reward_asset}
-          />
-        ) : (
-          <div>
-            <Button
-              data-testid="connect-to-vega-wallet-btn"
-              onClick={() => {
-                appDispatch({
-                  type: AppStateActionType.SET_VEGA_WALLET_OVERLAY,
-                  isOpen: true,
-                });
-                openVegaWalletDialog();
-              }}
-            >
-              {t('connectVegaWallet')}
-            </Button>
-          </div>
-        )}
+        <VegaWalletContainer
+          render={(pubKey) => (
+            <RewardInfo
+              currVegaKey={pubKey}
+              data={data}
+              rewardAssetId={params.reward_asset}
+            />
+          )}
+        />
       </section>
     </section>
   );

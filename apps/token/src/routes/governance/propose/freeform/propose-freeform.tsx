@@ -74,8 +74,9 @@ export const ProposeFreeform = () => {
   return (
     <AsyncRenderer loading={loading} error={error} data={params}>
       <Heading title={t('NewFreeformProposal')} />
-      <VegaWalletContainer>
-        {() => (
+      <VegaWalletContainer
+        // TODO why is this not using the pubkey argument?
+        render={() => (
           <>
             <ProposalMinRequirements
               minProposalBalance={
@@ -143,7 +144,7 @@ export const ProposeFreeform = () => {
             </div>
           </>
         )}
-      </VegaWalletContainer>
+      />
     </AsyncRenderer>
   );
 };

@@ -103,8 +103,9 @@ export const ProposeNewAsset = () => {
       data={params}
     >
       <Heading title={t('NewAssetProposal')} />
-      <VegaWalletContainer>
-        {() => (
+      <VegaWalletContainer
+        // TODO why is this not using the pubkey argument?
+        render={() => (
           <>
             <ProposalMinRequirements
               minProposalBalance={
@@ -202,7 +203,7 @@ export const ProposeNewAsset = () => {
             </div>
           </>
         )}
-      </VegaWalletContainer>
+      />
     </AsyncRenderer>
   );
 };

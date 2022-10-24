@@ -98,8 +98,8 @@ export const ProposeUpdateAsset = () => {
       data={params}
     >
       <Heading title={t('UpdateAssetProposal')} />
-      <VegaWalletContainer>
-        {() => (
+      <VegaWalletContainer
+        render={() => (
           <>
             <ProposalMinRequirements
               minProposalBalance={
@@ -194,7 +194,7 @@ export const ProposeUpdateAsset = () => {
             </div>
           </>
         )}
-      </VegaWalletContainer>
+      />
     </AsyncRenderer>
   );
 };

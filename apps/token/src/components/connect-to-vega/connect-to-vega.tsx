@@ -24,7 +24,7 @@ export const ConnectToVega = () => {
       }}
       data-testid="connect-to-vega-wallet-btn"
     >
-      {t('connectVegaWallet')}
+      {t('Connect')}
     </Button>
   );
 };

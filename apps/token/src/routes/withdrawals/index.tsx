@@ -21,9 +21,9 @@ const Withdrawals = ({ name }: RouteChildProps) => {
   return (
     <>
       <Heading title={t('withdrawalsTitle')} />
-      <VegaWalletContainer>
-        {(currVegaKey) => <WithdrawPendingContainer />}
-      </VegaWalletContainer>
+      <VegaWalletContainer
+        render={(currVegaKey) => <WithdrawPendingContainer />}
+      />
     </>
   );
 };

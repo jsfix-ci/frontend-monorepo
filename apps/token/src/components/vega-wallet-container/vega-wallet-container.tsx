@@ -1,43 +1,29 @@
-import { Button } from '@vegaprotocol/ui-toolkit';
-import { useVegaWallet, useVegaWalletDialogStore } from '@vegaprotocol/wallet';
-import React from 'react';
+import { Splash } from '@vegaprotocol/ui-toolkit';
+import { useVegaWallet } from '@vegaprotocol/wallet';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
-
-import {
-  AppStateActionType,
-  useAppState,
-} from '../../contexts/app-state/app-state-context';
+import { ConnectToVega } from '../connect-to-vega';
 
 interface VegaWalletContainerProps {
-  children: (key: string) => React.ReactElement;
+  render: (key: string) => ReactElement;
 }
 
-export const VegaWalletContainer = ({ children }: VegaWalletContainerProps) => {
-  const { t } = useTranslation();
+export const VegaWalletContainer = ({ render }: VegaWalletContainerProps) => {
   const { pubKey } = useVegaWallet();
-  const { appDispatch } = useAppState();
-  const { openVegaWalletDialog } = useVegaWalletDialogStore((store) => ({
-    openVegaWalletDialog: store.openVegaWalletDialog,
-  }));
+  const { t } = useTranslation();
 
   if (!pubKey) {
     return (
-      <p>
-        <Button
-          data-testid="connect-to-vega-wallet-btn"
-          onClick={() => {
-            appDispatch({
-              type: AppStateActionType.SET_VEGA_WALLET_OVERLAY,
-              isOpen: true,
-            });
-            openVegaWalletDialog();
-          }}
-        >
-          {t('connectVegaWallet')}
-        </Button>
-      </p>
+      <Splash>
+        <div className="text-center">
+          <p className="mb-4" data-testid="connect-vega-wallet-text">
+            {t('Connect your Vega wallet')}
+          </p>
+          <ConnectToVega />
+        </div>
+      </Splash>
     );
   }
 
-  return children(pubKey);
+  return render(pubKey);
 };

@@ -39,8 +39,8 @@ export const ProposeRaw = () => {
   return (
     <>
       <Heading title={t('NewRawProposal')} />
-      <VegaWalletContainer>
-        {() => (
+      <VegaWalletContainer
+        render={() => (
           <>
             {VEGA_DOCS_URL && (
               <p className="text-sm" data-testid="proposal-docs-link">
@@ -93,7 +93,7 @@ export const ProposeRaw = () => {
             </div>
           </>
         )}
-      </VegaWalletContainer>
+      />
     </>
   );
 };
