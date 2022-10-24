@@ -1,0 +1,44 @@
+fragment TransferFields on Transfer {
+  id
+  from
+  fromAccountType
+  to
+  toAccountType
+  asset {
+    id
+    symbol
+    decimals
+  }
+  amount
+  reference
+  status
+  timestamp
+  kind {
+    ... on OneOffTransfer {
+      deliverOn
+    }
+    ... on RecurringTransfer {
+      startEpoch
+      endEpoch
+      factor
+      dispatchStrategy {
+        dispatchMetric
+        dispatchMetricAssetId
+        marketIdsInScope
+      }
+    }
+  }
+}
+
+query Transfers($partyId: ID!) {
+  party(id: $partyId) {
+    id
+    transfersConnection {
+      edges {
+        node {
+          ...TransferFields
+        }
+      }
+    }
+  }
+}

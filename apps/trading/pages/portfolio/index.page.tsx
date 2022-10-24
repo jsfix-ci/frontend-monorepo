@@ -12,6 +12,8 @@ import { ResizableGrid } from '@vegaprotocol/ui-toolkit';
 import { LayoutPriority } from 'allotment';
 import { usePageTitleStore } from '../../stores';
 import { AccountsContainer } from './accounts-container';
+import { Transfers } from './transfers';
+import { LedgerEntries } from './leger-entries';
 
 const Portfolio = () => {
   const { updateTitle } = usePageTitleStore((store) => ({
@@ -28,6 +30,16 @@ const Portfolio = () => {
         <ResizableGridPanel minSize={75}>
           <PortfolioGridChild>
             <Tabs>
+              <Tab id="ledger-entries" name={t('Ledger Entries')}>
+                <VegaWalletContainer>
+                  <LedgerEntries />
+                </VegaWalletContainer>
+              </Tab>
+              <Tab id="transfers" name={t('Transfers')}>
+                <VegaWalletContainer>
+                  <Transfers />
+                </VegaWalletContainer>
+              </Tab>
               <Tab id="positions" name={t('Positions')}>
                 <VegaWalletContainer>
                   <PositionsContainer />
