@@ -1,5 +1,4 @@
 fragment LedgerEntry on AggregatedLedgerEntries {
-  id
   vegaTime
   quantity
   partyId
@@ -11,10 +10,12 @@ fragment LedgerEntry on AggregatedLedgerEntries {
 
 query LedgerEntries($partyId: ID!) {
   ledgerEntries(
-    filter: {
-      AccountFromFilters: [{ partyIds: [$partyId] }]
-      AccountToFilters: [{ partyIds: [$partyId] }]
+    filter: { AccountFromFilter: { partyIds: [$partyId] } }
+    groupOptions: {
+      ByAccountField: [PartyId, AccountType, AssetId, MarketId]
+      ByLedgerEntryField: [TransferType]
     }
+    pagination: { first: 500 }
   ) {
     edges {
       node {

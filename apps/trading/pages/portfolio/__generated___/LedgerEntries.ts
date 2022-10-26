@@ -3,18 +3,17 @@ import { Schema as Types } from '@vegaprotocol/types';
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 const defaultOptions = {} as const;
-export type LedgerEntryFragment = { __typename?: 'AggregatedLedgerEntries', id?: string | null, vegaTime: string, quantity: string, partyId?: string | null, assetId?: string | null, marketId?: string | null, accountType?: Types.AccountType | null, transferType?: string | null };
+export type LedgerEntryFragment = { __typename?: 'AggregatedLedgerEntries', vegaTime: string, quantity: string, partyId?: string | null, assetId?: string | null, marketId?: string | null, accountType?: Types.AccountType | null, transferType?: string | null };
 
 export type LedgerEntriesQueryVariables = Types.Exact<{
   partyId: Types.Scalars['ID'];
 }>;
 
 
-export type LedgerEntriesQuery = { __typename?: 'Query', ledgerEntries: { __typename?: 'AggregatedLedgerEntriesConnection', edges: Array<{ __typename?: 'AggregatedLedgerEntriesEdge', node: { __typename?: 'AggregatedLedgerEntries', id?: string | null, vegaTime: string, quantity: string, partyId?: string | null, assetId?: string | null, marketId?: string | null, accountType?: Types.AccountType | null, transferType?: string | null } } | null> } };
+export type LedgerEntriesQuery = { __typename?: 'Query', ledgerEntries: { __typename?: 'AggregatedLedgerEntriesConnection', edges: Array<{ __typename?: 'AggregatedLedgerEntriesEdge', node: { __typename?: 'AggregatedLedgerEntries', vegaTime: string, quantity: string, partyId?: string | null, assetId?: string | null, marketId?: string | null, accountType?: Types.AccountType | null, transferType?: string | null } } | null> } };
 
 export const LedgerEntryFragmentDoc = gql`
     fragment LedgerEntry on AggregatedLedgerEntries {
-  id
   vegaTime
   quantity
   partyId
@@ -27,7 +26,9 @@ export const LedgerEntryFragmentDoc = gql`
 export const LedgerEntriesDocument = gql`
     query LedgerEntries($partyId: ID!) {
   ledgerEntries(
-    filter: {AccountFromFilters: [{partyIds: [$partyId]}], AccountToFilters: [{partyIds: [$partyId]}]}
+    filter: {AccountFromFilter: {partyIds: [$partyId]}}
+    groupOptions: {ByAccountField: [PartyId, AccountType, AssetId, MarketId], ByLedgerEntryField: [TransferType]}
+    pagination: {first: 500}
   ) {
     edges {
       node {

@@ -5,16 +5,17 @@ import { useTransfersQuery } from './__generated___/Transfers';
 export const Transfers = () => {
   const { pubKey } = useVegaWallet();
   const { data, loading, error } = useTransfersQuery({
-    variables: { partyId: pubKey },
+    variables: { partyId: pubKey || '' },
+    skip: !pubKey,
   });
   console.log(data);
   return (
     <AsyncRenderer data={data} loading={loading} error={error}>
-      <Table />
+      <Table data={data} />
     </AsyncRenderer>
   );
 };
 
-const Table = () => {
-  return <div>Foo</div>;
+const Table = ({ data }: { data: any }) => {
+  return <pre>{JSON.stringify(data, null, 2)}</pre>;
 };
