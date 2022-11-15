@@ -4,6 +4,7 @@ import type { BlockExplorerTransactionResult } from '../../../routes/types/block
 import React from 'react';
 import { TruncateInline } from '../../../components/truncate/truncate';
 import { Link } from 'react-router-dom';
+import { TxDetailsOrder } from '../../../components/txs/details/tx-order';
 
 interface TxDetailsProps {
   txData: BlockExplorerTransactionResult | undefined;
@@ -24,7 +25,7 @@ export const TxDetails = ({ txData, pubKey, className }: TxDetailsProps) => {
 
   return (
     <section className="mb-10">
-      <h3 className="text-3xl xl:text-4xl uppercase font-alpha mb-4">
+      <h3 className="text-l xl:text-l uppercase mb-4">
         {txData.type} by{' '}
         <Link
           className="font-bold underline"
@@ -33,13 +34,13 @@ export const TxDetails = ({ txData, pubKey, className }: TxDetailsProps) => {
           {truncatedSubmitter}
         </Link>
       </h3>
-      <p className="text-xl xl:text-2xl uppercase font-alpha">
+      <TxDetailsOrder txData={txData} pubKey={pubKey} />
+      <p className="text-m xl:text-m uppercase font-alpha">
         Block{' '}
         <Link
           className="font-bold underline"
           to={`/${Routes.BLOCKS}/${txData.block}`}
         >
-          {txData.block}
         </Link>
         {', '}
         Index {txData.index}

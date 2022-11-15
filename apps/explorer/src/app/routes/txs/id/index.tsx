@@ -22,6 +22,8 @@ const Tx = () => {
     `${DATA_SOURCES.blockExplorerUrl}/transactions/${toNonHex(hash)}`
   );
 
+  console.dir(data)
+
   return (
     <section>
       <Link
@@ -36,9 +38,7 @@ const Tx = () => {
       </Link>
 
       <PageHeader
-        title={hash}
-        prefix="Transaction"
-        copy
+        title="transaction"
         truncateStart={5}
         truncateEnd={9}
         className="mb-5"
@@ -52,7 +52,9 @@ const Tx = () => {
             pubKey={data?.transaction.submitter}
           />
 
-          <TxContent data={data?.transaction} />
+          <details>
+            <TxContent data={data?.transaction} />
+          </details>
         </>
       </RenderFetched>
     </section>

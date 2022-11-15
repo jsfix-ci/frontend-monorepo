@@ -20,10 +20,10 @@ export const PageHeader = ({
   copy = false,
   className,
 }: PageHeaderProps) => {
-  const titleClasses = 'text-4xl xl:text-5xl uppercase font-alpha';
+  const titleClasses = 'text-xl xl:text-xl uppercase ';
   return (
     <header className={className}>
-      <span className={`${titleClasses} block`}>{prefix}</span>
+      <span className={`${titleClasses}`}>{prefix}</span>
       <div className="flex items-center gap-x-4">
         <h2 className={titleClasses}>
           {truncateStart && truncateEnd ? (
