@@ -1,5 +1,4 @@
 import React from 'react';
-import { t } from '@vegaprotocol/react-helpers';
 import { Routes } from '../../../routes/route-names';
 import { useExplorerMarketQuery } from './__generated___/Market';
 import { Link } from 'react-router-dom';
@@ -8,6 +7,11 @@ export type NodeLinkProps = {
   id: string;
 };
 
+/**
+ * Given a market ID, it will fetch the market name and show that,
+ * with a link to the markets list. If the name does not come back
+ * it will use the ID instead
+ */
 const MarketLink = ({ id }: NodeLinkProps) => {
   const { data } = useExplorerMarketQuery({
     variables: { id },
@@ -20,7 +24,7 @@ const MarketLink = ({ id }: NodeLinkProps) => {
   }
 
   return (
-    <Link className="font-bold underline" to={`/${Routes.MARKETS}#${id}`}>
+    <Link className="underline" to={`/${Routes.MARKETS}#${id}`}>
       {label}
     </Link>
   );

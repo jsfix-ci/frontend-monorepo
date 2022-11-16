@@ -8,7 +8,7 @@ export type PartyLinkProps = {
 
 const PartyLink = ({ id }: PartyLinkProps) => {
   return (
-    <Link className="font-bold underline" to={`/${Routes.PARTIES}/${id}`}>
+    <Link className="underline" to={`/${Routes.PARTIES}/${id}`}>
       {id}
     </Link>
   );

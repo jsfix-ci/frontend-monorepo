@@ -5,8 +5,8 @@ import type {
   BlockExplorerTransactionResult,
   SubmitOrder,
 } from '../../../routes/types/block-explorer-response';
-import PartyLink from '../../links/party-link/party-link';
-import MarketLink from '../../links/market-link/market-link';
+import { PartyLink } from '../../links/';
+import { MarketLink } from '../../links/';
 
 interface TxDetailsOrderProps {
   txData: BlockExplorerTransactionResult | undefined;
@@ -25,8 +25,6 @@ export const TxDetailsOrder = ({ txData, pubKey }: TxDetailsOrderProps) => {
   }
 
   const cmd = txData.command as SubmitOrder;
-
-  console.dir(cmd);
 
   return (
     <KeyValueTable>

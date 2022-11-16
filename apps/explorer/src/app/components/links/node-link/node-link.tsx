@@ -20,7 +20,7 @@ const NodeLink = ({ id }: NodeLinkProps) => {
   }
 
   return (
-    <Link className="font-bold underline" to={`/${Routes.VALIDATORS}#${id}`}>
+    <Link className="underline" to={`/${Routes.VALIDATORS}#${id}`}>
       {label}
     </Link>
   );

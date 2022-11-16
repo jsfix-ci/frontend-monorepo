@@ -17,6 +17,7 @@ import { Routes } from '../../route-names';
 import { RenderFetched } from '../../../components/render-fetched';
 import { HighlightedLink } from '../../../components/highlighted-link';
 import { t, useFetch } from '@vegaprotocol/react-helpers';
+import { NodeLink } from '../../../components/links';
 
 const Block = () => {
   const { block } = useParams<{ block: string }>();
@@ -60,9 +61,8 @@ const Block = () => {
                 <TableRow modifier="bordered">
                   <TableHeader scope="row">Mined by</TableHeader>
                   <TableCell modifier="bordered">
-                    <HighlightedLink
-                      to={`/${Routes.VALIDATORS}`}
-                      text={blockData.result.block.header.proposer_address}
+                    <NodeLink
+                      id={blockData.result.block.header.proposer_address}
                       data-testid="block-validator"
                     />
                   </TableCell>

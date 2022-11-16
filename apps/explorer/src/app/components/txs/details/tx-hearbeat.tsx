@@ -5,8 +5,7 @@ import type {
   BlockExplorerTransactionResult,
   ValidatorHeartbeat,
 } from '../../../routes/types/block-explorer-response';
-import NodeLink from '../../links/node-link/node-link';
-import PartyLink from '../../links/party-link/party-link';
+import { BlockLink, NodeLink, PartyLink } from '../../links/';
 
 /**
  * Returns an integer representing how fresh the signature is, ranging from 1 to 500.
@@ -44,7 +43,8 @@ interface TxDetailsHeartbeatProps {
  *
  * For the sake of block explorer, these design decisions were made:
  * - The signature values are not interesting. They're available in details but not worth displaying
- * -
+ * - Freshness is a word that isn't used anywhere else. It's meant to imply how close to the lower
+ *   bound the signature was. But it doesn't matter as long as it's less than 500.
  * @param param0
  * @returns
  */
@@ -61,19 +61,19 @@ export const TxDetailsHeartbeat = ({
   return (
     <KeyValueTable>
       <KeyValueTableRow>
-        {'Submitter'}
+        {t('Submitter')}
         {pubKey ? <PartyLink id={pubKey} /> : '-'}
       </KeyValueTableRow>
       <KeyValueTableRow>
-        {'Node'}
+        {t('Node')}
         <NodeLink id={cmd.validatorHeartbeat.nodeId} />
       </KeyValueTableRow>
       <KeyValueTableRow>
-        {'Signature for block'}
-        {cmd.blockHeight}
+        {t('Signed block height')}
+        <BlockLink height={cmd.blockHeight} />
       </KeyValueTableRow>
       <KeyValueTableRow>
-        {'Freshness (lower is better)'}
+        {t('Freshness (lower is better)')}
         {scoreFreshness(txData.block, cmd.blockHeight)}
       </KeyValueTableRow>
     </KeyValueTable>
