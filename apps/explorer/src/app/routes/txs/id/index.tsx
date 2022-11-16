@@ -22,7 +22,7 @@ const Tx = () => {
     `${DATA_SOURCES.blockExplorerUrl}/transactions/${toNonHex(hash)}`
   );
 
-  console.dir(data)
+  console.dir(data);
 
   return (
     <section>
