@@ -18,7 +18,7 @@ export const TimeAgo = ({ date, ...props }: TimeAgoProps) => {
     return () => clearInterval(int);
   }, [setDistanceToNow, date]);
 
-  if (!date) {
+  if (!date || date.length === 0) {
     return <>{t('Date unknown')}</>;
   }
 

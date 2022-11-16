@@ -6,6 +6,9 @@ import type {
   ValidatorHeartbeat,
 } from '../../../routes/types/block-explorer-response';
 import { BlockLink, NodeLink, PartyLink } from '../../links/';
+import type { TendermintBlocksResponse } from '../../../routes/blocks/tendermint-blocks-response';
+import { TimeAgo } from '../../time-ago';
+import { Block } from '../../../routes/blocks/id';
 
 /**
  * Returns an integer representing how fresh the signature is, ranging from 1 to 500.
@@ -31,6 +34,7 @@ export function scoreFreshness(
 interface TxDetailsHeartbeatProps {
   txData: BlockExplorerTransactionResult | undefined;
   pubKey: string | undefined;
+  blockData: TendermintBlocksResponse | undefined;
 }
 
 /**
@@ -51,18 +55,35 @@ interface TxDetailsHeartbeatProps {
 export const TxDetailsHeartbeat = ({
   txData,
   pubKey,
+  blockData,
 }: TxDetailsHeartbeatProps) => {
   if (!txData) {
     return <>{t('Awaiting Block Explorer transaction details')}</>;
   }
 
   const cmd = txData.command as ValidatorHeartbeat;
+  const time: string = blockData?.result.block.header.time || '';
+  const height: string = blockData?.result.block.header.height || '';
 
   return (
     <KeyValueTable>
       <KeyValueTableRow>
         {t('Submitter')}
         {pubKey ? <PartyLink id={pubKey} /> : '-'}
+      </KeyValueTableRow>
+      <KeyValueTableRow>
+        {t('Block')}
+        <BlockLink height={height} />
+      </KeyValueTableRow>
+      <KeyValueTableRow>
+        {t('Time')}
+        {time ? (
+          <span>
+            {time} (<TimeAgo date={time} /> )
+          </span>
+        ) : (
+          '-'
+        )}
       </KeyValueTableRow>
       <KeyValueTableRow>
         {t('Node')}

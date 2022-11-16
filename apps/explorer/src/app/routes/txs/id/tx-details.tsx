@@ -19,8 +19,6 @@ export const TxDetails = ({ txData, pubKey, className }: TxDetailsProps) => {
     return <>{t('Awaiting Block Explorer transaction details')}</>;
   }
 
-  console.log('---tx-details-re-render----');
-
   const truncatedSubmitter = (
     <TruncateInline text={pubKey || ''} startChars={5} endChars={5} />
   );
@@ -36,19 +34,7 @@ export const TxDetails = ({ txData, pubKey, className }: TxDetailsProps) => {
           {truncatedSubmitter}
         </Link>
       </h3>
-      <TxDetailsWrapper txData={txData} pubKey={pubKey} />
-
-      <p className="text-m xl:text-m uppercase">
-        Block{' '}
-        <Link
-          className="font-bold underline"
-          to={`/${Routes.BLOCKS}/${txData.block}`}
-        >
-          {txData.block}
-        </Link>
-        {', '}
-        Index {txData.index}
-      </p>
+      <TxDetailsWrapper height={txData.block} txData={txData} pubKey={pubKey} />
     </section>
   );
 };

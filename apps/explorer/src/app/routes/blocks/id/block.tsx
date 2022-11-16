@@ -15,7 +15,6 @@ import { TxsPerBlock } from '../../../components/txs/txs-per-block';
 import { Button } from '@vegaprotocol/ui-toolkit';
 import { Routes } from '../../route-names';
 import { RenderFetched } from '../../../components/render-fetched';
-import { HighlightedLink } from '../../../components/highlighted-link';
 import { t, useFetch } from '@vegaprotocol/react-helpers';
 import { NodeLink } from '../../../components/links';
 
