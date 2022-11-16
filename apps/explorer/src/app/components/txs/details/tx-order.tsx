@@ -1,7 +1,12 @@
 import React from 'react';
 import { t } from '@vegaprotocol/react-helpers';
 import { KeyValueTable, KeyValueTableRow } from '@vegaprotocol/ui-toolkit';
-import type { BlockExplorerTransactionResult } from '../../../routes/types/block-explorer-response';
+import type {
+  BlockExplorerTransactionResult,
+  SubmitOrder,
+} from '../../../routes/types/block-explorer-response';
+import PartyLink from '../../links/party-link/party-link';
+import MarketLink from '../../links/market-link/market-link';
 
 interface TxDetailsOrderProps {
   txData: BlockExplorerTransactionResult | undefined;
@@ -19,11 +24,19 @@ export const TxDetailsOrder = ({ txData, pubKey }: TxDetailsOrderProps) => {
     return <>{t('Awaiting Block Explorer transaction details')}</>;
   }
 
+  const cmd = txData.command as SubmitOrder;
+
+  console.dir(cmd);
+
   return (
     <KeyValueTable>
       <KeyValueTableRow>
-        {'Submitter'}
-        {pubKey}
+        {t('Submitter')}
+        {pubKey ? <PartyLink id={pubKey} /> : '-'}
+      </KeyValueTableRow>
+      <KeyValueTableRow>
+        {t('Market')}
+        <MarketLink id={cmd.orderSubmission.marketId} />
       </KeyValueTableRow>
     </KeyValueTable>
   );

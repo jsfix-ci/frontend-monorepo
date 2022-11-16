@@ -5,6 +5,8 @@ import type {
   BlockExplorerTransactionResult,
   ValidatorHeartbeat,
 } from '../../../routes/types/block-explorer-response';
+import NodeLink from '../../links/node-link/node-link';
+import PartyLink from '../../links/party-link/party-link';
 
 /**
  * Returns an integer representing how fresh the signature is, ranging from 1 to 500.
@@ -60,11 +62,11 @@ export const TxDetailsHeartbeat = ({
     <KeyValueTable>
       <KeyValueTableRow>
         {'Submitter'}
-        {pubKey}
+        {pubKey ? <PartyLink id={pubKey} /> : '-'}
       </KeyValueTableRow>
       <KeyValueTableRow>
         {'Node'}
-        {cmd.validatorHeartbeat.nodeId}
+        <NodeLink id={cmd.validatorHeartbeat.nodeId} />
       </KeyValueTableRow>
       <KeyValueTableRow>
         {'Signature for block'}

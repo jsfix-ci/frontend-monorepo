@@ -35,7 +35,9 @@ export interface ValidatorHeartbeatSignature {
 }
 
 export interface SubmitOrder {
-  marketId: string;
+  orderSubmission: {
+    marketId: string;
+  };
 }
 
 export interface StateVariableProposal {

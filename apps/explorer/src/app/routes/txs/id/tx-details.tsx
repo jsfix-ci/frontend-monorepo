@@ -19,10 +19,11 @@ export const TxDetails = ({ txData, pubKey, className }: TxDetailsProps) => {
     return <>{t('Awaiting Block Explorer transaction details')}</>;
   }
 
+  console.log('---tx-details-re-render----');
+
   const truncatedSubmitter = (
     <TruncateInline text={pubKey || ''} startChars={5} endChars={5} />
   );
-  console.dir(txData);
 
   return (
     <section className="mb-10">
