@@ -17,6 +17,29 @@ import { useTxsData } from '../../../hooks/use-txs-data';
 import { TxsInfiniteList } from '../../../components/txs';
 import { PageHeader } from '../../../components/page-header';
 import { useExplorerPartyAssetsQuery } from './__generated__/party-assets';
+import { MarketLink } from '../../../components/links';
+
+function getMarketLink(id: string | undefined) {
+  if (!id) {
+    return null;
+  }
+
+  return <MarketLink id={id} />;
+}
+
+function getTypeLabel(label: string) {
+  switch (label) {
+    case 'ACCOUNT_TYPE_BOND':
+      return 'Bond';
+    case 'ACCOUNT_TYPE_MARGIN':
+      return 'Margin';
+    case 'ACCOUNT_TYPE_GENERAL':
+      return 'General';
+
+    default:
+      return label;
+  }
+}
 
 const Party = () => {
   const { party } = useParams<{ party: string }>();
@@ -69,15 +92,23 @@ const Party = () => {
           return (
             <InfoPanel title={account.asset.name} id={account.asset.id}>
               <section>
-                <dl className="flex gap-2">
-                  <dt className="text-zinc-500 dark:text-zinc-400 text-md">
-                    {t('Balance')} ({account.asset.symbol})
+                <dl className="flex gap-2 flex-wrap">
+                  <dt className="text-zinc-500 dark:text-zinc-400 text-md flex-1">
+                    <p>
+                      {t('Balance')} ({account.asset.symbol})
+                    </p>
                   </dt>
-                  <dd className="text-md">
+                  <dd className="text-md flex-2">
                     {addDecimalsFormatNumber(
                       account.balance,
                       account.asset.decimals
                     )}
+                  </dd>
+                  <dt className="text-zinc-500 dark:text-zinc-400 text-md flex-1">
+                    {getTypeLabel(account.type)}
+                  </dt>
+                  <dd className="text-md flex-2">
+                    {getMarketLink(account.market?.id)}
                   </dd>
                 </dl>
               </section>

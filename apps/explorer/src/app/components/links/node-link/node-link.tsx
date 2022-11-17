@@ -1,7 +1,6 @@
 import React from 'react';
-import { t } from '@vegaprotocol/react-helpers';
 import { Routes } from '../../../routes/route-names';
-import { useExplorerNodeQuery } from './__generated___/Node';
+import { useExplorerNodeQuery } from './__generated__/Node';
 import { Link } from 'react-router-dom';
 
 export type NodeLinkProps = {

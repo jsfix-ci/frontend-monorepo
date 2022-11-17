@@ -8,7 +8,11 @@ export interface BlockExplorerTransactionResult {
   type: string;
   code: number;
   cursor: string;
-  command: ValidatorHeartbeat | SubmitOrder | StateVariableProposal;
+  command:
+    | ValidatorHeartbeat
+    | SubmitOrder
+    | StateVariableProposal
+    | AmendLiquidityProvisionOrder;
 }
 
 export interface BlockExplorerTransactions {
@@ -28,6 +32,7 @@ export interface ValidatorHeartbeat {
     vegaSignature: ValidatorHeartbeatSignature;
   };
 }
+
 export interface ValidatorHeartbeatSignature {
   algo: string;
   value: string;
@@ -52,4 +57,23 @@ export interface StateVariableProposalValues {
   key: 'up' | 'down';
   tolerance: string;
   value: UnknownObject;
+}
+
+export interface AmendLiquidityProvisionOrder {
+  blockHeight: string;
+  nonce: string;
+  liquidityProvisionAmendment: {
+    marketId: string;
+    commitmentAmount: string;
+    fee: string;
+    sells: LiquidityProvisionOrderChange[];
+    buys: LiquidityProvisionOrderChange[];
+    reference: string;
+  };
+}
+
+export interface LiquidityProvisionOrderChange {
+  string: Reference;
+  proportion: number;
+  offset: string;
 }

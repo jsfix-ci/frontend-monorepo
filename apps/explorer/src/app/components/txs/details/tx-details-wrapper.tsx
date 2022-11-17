@@ -5,6 +5,7 @@ import { TxDetailsOrder } from './tx-order';
 import type { BlockExplorerTransactionResult } from '../../../routes/types/block-explorer-response';
 import type { TendermintBlocksResponse } from '../../../routes/blocks/tendermint-blocks-response';
 import { TxDetailsHeartbeat } from './tx-hearbeat';
+import { TxDetailsLPAmend } from './tx-lp-amend';
 
 interface TxDetailsWrapperProps {
   txData: BlockExplorerTransactionResult | undefined;
@@ -40,6 +41,10 @@ export const TxDetailsWrapper = ({
         blockData={blockData}
         pubKey={pubKey}
       />
+    );
+  } else if (txData.type === 'Amend LiquidityProvision Order') {
+    child = (
+      <TxDetailsLPAmend txData={txData} blockData={blockData} pubKey={pubKey} />
     );
   } else {
     child = <code>{JSON.stringify(txData)}</code>;

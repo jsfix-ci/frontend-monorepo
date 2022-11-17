@@ -1,9 +1,9 @@
 import React from 'react';
 import { Routes } from '../../../routes/route-names';
-import { useExplorerMarketQuery } from './__generated___/Market';
+import { useExplorerMarketQuery } from './__generated__/Market';
 import { Link } from 'react-router-dom';
 
-export type NodeLinkProps = {
+export type MarketLinkProps = {
   id: string;
 };
 
@@ -12,7 +12,7 @@ export type NodeLinkProps = {
  * with a link to the markets list. If the name does not come back
  * it will use the ID instead
  */
-const MarketLink = ({ id }: NodeLinkProps) => {
+const MarketLink = ({ id }: MarketLinkProps) => {
   const { data } = useExplorerMarketQuery({
     variables: { id },
   });
