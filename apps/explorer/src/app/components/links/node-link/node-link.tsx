@@ -7,7 +7,7 @@ export type NodeLinkProps = {
   id: string;
 };
 
-const NodeLink = ({ id }: NodeLinkProps) => {
+const NodeLink = ({ id, ...props }: NodeLinkProps) => {
   const { data } = useExplorerNodeQuery({
     variables: { id },
   });
@@ -19,7 +19,7 @@ const NodeLink = ({ id }: NodeLinkProps) => {
   }
 
   return (
-    <Link className="underline" to={`/${Routes.VALIDATORS}#${id}`}>
+    <Link className="underline" to={`/${Routes.VALIDATORS}#${id}`} {...props}>
       {label}
     </Link>
   );

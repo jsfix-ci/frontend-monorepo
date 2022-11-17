@@ -12,7 +12,7 @@ export type AssetLinkProps = {
  * with a link to the assets list. If the name does not come back
  * it will use the ID instead.
  */
-const AssetLink = ({ id }: AssetLinkProps) => {
+const AssetLink = ({ id, ...props }: AssetLinkProps) => {
   const { data } = useExplorerAssetQuery({
     variables: { id },
   });
@@ -24,7 +24,7 @@ const AssetLink = ({ id }: AssetLinkProps) => {
   }
 
   return (
-    <Link className="underline" to={`/${Routes.MARKETS}#${id}`}>
+    <Link className="underline" to={`/${Routes.MARKETS}#${id}`} {...props}>
       {label}
     </Link>
   );

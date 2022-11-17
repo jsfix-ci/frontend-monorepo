@@ -6,9 +6,9 @@ export type BlockLinkProps = {
   height: string;
 };
 
-const BlockLink = ({ height }: BlockLinkProps) => {
+const BlockLink = ({ height, ...props }: BlockLinkProps) => {
   return (
-    <Link className="underline" to={`/${Routes.BLOCKS}/${height}`}>
+    <Link className="underline" to={`/${Routes.BLOCKS}/${height}`} {...props}>
       {height}
     </Link>
   );

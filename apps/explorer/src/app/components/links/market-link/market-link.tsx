@@ -12,7 +12,7 @@ export type MarketLinkProps = {
  * with a link to the markets list. If the name does not come back
  * it will use the ID instead
  */
-const MarketLink = ({ id }: MarketLinkProps) => {
+const MarketLink = ({ id, ...props }: MarketLinkProps) => {
   const { data } = useExplorerMarketQuery({
     variables: { id },
   });
@@ -24,7 +24,7 @@ const MarketLink = ({ id }: MarketLinkProps) => {
   }
 
   return (
-    <Link className="underline" to={`/${Routes.MARKETS}#${id}`}>
+    <Link className="underline" to={`/${Routes.MARKETS}#${id}`} {...props}>
       {label}
     </Link>
   );
