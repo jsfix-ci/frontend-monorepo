@@ -12,6 +12,7 @@ const stakedByDelegates = '[data-testid="staked-by-delegates"]';
 const stakeShare = '[data-testid="stake-percentage"]';
 const epochCountDown = '[data-testid="epoch-countdown"]';
 const stakeNumberRegex = /^\d*\.?\d*$/;
+const ownStake = '[data-testid="stake-this-epoch"]';
 
 context('Staking Page - verify elements on page', function () {
   before('navigate to staking page', function () {
@@ -169,6 +170,11 @@ context('Staking Page - verify elements on page', function () {
               );
             }
           });
+      });
+
+      // 2001-STKE-013
+      it('Should be able to see own stake this epoch', function () {
+        cy.get(ownStake).invoke('text').should('match', stakeNumberRegex);
       });
 
       // 2001-STKE-011 2002-SINC-001 2002-SINC-002
