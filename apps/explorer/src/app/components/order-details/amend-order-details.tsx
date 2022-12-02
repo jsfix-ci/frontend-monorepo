@@ -4,28 +4,33 @@ import { MarketLink } from '../links';
 import PriceInMarket from '../price-in-market/price-in-market';
 import { Time } from '../time';
 
-import { wrapperClasses, tifShort, sideText, peggedReference } from './deterministic-order-details';
+import {
+  tifShort,
+  sideText,
+  peggedReference,
+} from './lib/order-labels';
 import type { components } from '../../../types/explorer';
 import { VegaColours } from '@vegaprotocol/tailwindcss-config';
+import { wrapperClasses } from './deterministic-order-details';
 
 export interface AmendOrderDetailsProps {
   id: string;
-  amend: components['schemas']['v1OrderAmendment'] 
+  amend: components['schemas']['v1OrderAmendment'];
   // Version to fetch, with 0 being 'latest' and 1 being 'first'. Defaults to 0
   version?: number;
 }
 
 export function getSideDeltaColour(delta: string): string {
   if (delta.charAt(0) === '-') {
-    return VegaColours.pink.DEFAULT
+    return VegaColours.pink.DEFAULT;
   } else {
-    return VegaColours.green.DEFAULT 
+    return VegaColours.green.DEFAULT;
   }
 }
 
 /**
  * This component renders the changes to an order made in an amend. It's very
- * similar to the deterministic-order-details component, and should probably 
+ * similar to the deterministic-order-details component, and should probably
  * eventually be merged in to that view. However the APIs to make that experience
  * work nicely are not available, so instead of making 1 complex component, it's
  * currently 2 similar components.
@@ -36,10 +41,10 @@ export function getSideDeltaColour(delta: string): string {
 const AmendOrderDetails = ({
   id,
   version = 0,
-  amend
+  amend,
 }: AmendOrderDetailsProps) => {
   const { data, error } = useExplorerDeterministicOrderQuery({
-    variables: { orderId: id, version},
+    variables: { orderId: id, version },
   });
 
   if (error || (data && !data.orderByID)) {
@@ -64,6 +69,7 @@ const AmendOrderDetails = ({
   }
 
   const o = data.orderByID;
+
   return (
     <div className={wrapperClasses}>
       <div className="mb-12 lg:mb-0">
@@ -74,7 +80,8 @@ const AmendOrderDetails = ({
             {t(' order')}
           </h2>
           <p className="text-gray-500 mb-4">
-            In <MarketLink id={o.market.id} />, updated at <Time date={o.updatedAt} />.
+            In <MarketLink id={o.market.id} />, updated at{' '}
+            <Time date={o.updatedAt} />.
           </p>
 
           <div className="grid md:grid-cols-4 gap-x-6">
@@ -83,7 +90,11 @@ const AmendOrderDetails = ({
                 <h2 className="text-2xl font-bold text-dark mb-4">
                   {t('New size')}
                 </h2>
-                <h5 className={`text-lg font-medium text-gray-500 mb-0 capitalize ${ getSideDeltaColour(amend.sizeDelta)}`}>
+                <h5
+                  className={`text-lg font-medium text-gray-500 mb-0 capitalize ${getSideDeltaColour(
+                    amend.sizeDelta
+                  )}`}
+                >
                   {amend.sizeDelta}
                 </h5>
               </div>
@@ -95,12 +106,13 @@ const AmendOrderDetails = ({
                   {t('New price')}
                 </h2>
                 <h5 className="text-lg font-medium text-gray-500 mb-0">
-                  <PriceInMarket price={amend.price} marketId={o.market.id} /> 
+                  <PriceInMarket price={amend.price} marketId={o.market.id} />
                 </h5>
               </div>
-            ): null}
+            ) : null}
 
-            {amend.timeInForce && amend.timeInForce !== 'TIME_IN_FORCE_UNSPECIFIED' ? (
+            {amend.timeInForce &&
+            amend.timeInForce !== 'TIME_IN_FORCE_UNSPECIFIED' ? (
               <div className="">
                 <h2 className="text-2xl font-bold text-dark mb-4">
                   {t('New TIF')}
@@ -109,9 +121,10 @@ const AmendOrderDetails = ({
                   {tifShort[amend.timeInForce]}
                 </h5>
               </div>
-            ): null}
+            ) : null}
 
-            {amend.peggedReference && amend.peggedReference !== 'PEGGED_REFERENCE_UNSPECIFIED' ? (
+            {amend.peggedReference &&
+            amend.peggedReference !== 'PEGGED_REFERENCE_UNSPECIFIED' ? (
               <div className="">
                 <h2 className="text-2xl font-bold text-dark mb-4">
                   {t('New reference')}
@@ -120,7 +133,7 @@ const AmendOrderDetails = ({
                   {peggedReference[amend.peggedReference]}
                 </h5>
               </div>
-            ): null}
+            ) : null}
 
             {amend.peggedOffset ? (
               <div className="">
@@ -131,8 +144,8 @@ const AmendOrderDetails = ({
                   {amend.peggedOffset}
                 </h5>
               </div>
-            ): null}
-            </div>
+            ) : null}
+          </div>
         </div>
       </div>
     </div>

@@ -49,7 +49,9 @@ export const TxDetailsOrderAmend = ({
         </TableRow>
       </TableWithTbody>
 
-      {orderId !== '-' ? <AmendOrderDetails id={orderId} amend={txData.command.orderAmendment} /> : null}
+      {orderId !== '-' ? (
+        <AmendOrderDetails id={orderId} amend={txData.command.orderAmendment} />
+      ) : null}
     </>
   );
 };
