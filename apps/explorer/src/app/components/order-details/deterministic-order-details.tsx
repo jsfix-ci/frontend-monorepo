@@ -11,7 +11,7 @@ export interface DeterministicOrderDetailsProps {
   version?: number;
 }
 
-const statusText: Record<Schema.OrderStatus, string> = {
+export const statusText: Record<Schema.OrderStatus, string> = {
   STATUS_ACTIVE: t('Active'),
   STATUS_CANCELLED: t('Cancelled'),
   STATUS_EXPIRED: t('Expired'),
@@ -23,12 +23,12 @@ const statusText: Record<Schema.OrderStatus, string> = {
   STATUS_STOPPED: t('Stopped'),
 };
 
-const sideText: Record<Schema.Side, string> = {
+export const sideText: Record<Schema.Side, string> = {
   SIDE_BUY: t('Buy'),
   SIDE_SELL: t('Sell'),
 };
 
-const tifShort: Record<Schema.OrderTimeInForce, string> = {
+export const tifShort: Record<Schema.OrderTimeInForce, string> = {
   TIME_IN_FORCE_FOK: t('FOK'),
   TIME_IN_FORCE_GFA: t('GFA'),
   TIME_IN_FORCE_GFN: t('GFN'),
@@ -37,7 +37,7 @@ const tifShort: Record<Schema.OrderTimeInForce, string> = {
   TIME_IN_FORCE_IOC: t('IOC'),
 };
 
-const tifFull: Record<Schema.OrderTimeInForce, string> = {
+export const tifFull: Record<Schema.OrderTimeInForce, string> = {
   TIME_IN_FORCE_FOK: t('Fill or Kill'),
   TIME_IN_FORCE_GFA: t('Good for Auction'),
   TIME_IN_FORCE_GFN: t('Good for Normal'),
@@ -45,7 +45,14 @@ const tifFull: Record<Schema.OrderTimeInForce, string> = {
   TIME_IN_FORCE_GTT: t("Good 'til Time"),
   TIME_IN_FORCE_IOC: t('Immediate or Cancel'),
 };
-const wrapperClasses =
+
+export const peggedReference: Record<Schema.PeggedReference, string> = {
+  PEGGED_REFERENCE_BEST_ASK: 'Best Ask',
+  PEGGED_REFERENCE_BEST_BID: 'Best Bid',
+  PEGGED_REFERENCE_MID: 'Best Mid'
+}
+
+export const wrapperClasses =
   'grid lg:grid-cols-1 flex items-center max-w-xl border border-zinc-200 dark:border-zinc-800 rounded-md pv-2 ph-5 mb-5';
 
 /**
@@ -64,9 +71,10 @@ const DeterministicOrderDetails = ({
   version = 0,
 }: DeterministicOrderDetailsProps) => {
   const { data, error } = useExplorerDeterministicOrderQuery({
-    variables: { orderId: id },
+    variables: { orderId: id, version },
   });
 
+  
   if (error || (data && !data.orderByID)) {
     return (
       <div className={wrapperClasses}>
@@ -83,6 +91,7 @@ const DeterministicOrderDetails = ({
       </div>
     );
   }
+  
 
   if (!data || !data.orderByID) {
     return null;
