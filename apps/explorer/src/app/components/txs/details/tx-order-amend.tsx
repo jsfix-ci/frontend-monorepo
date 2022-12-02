@@ -36,6 +36,12 @@ export const TxDetailsOrderAmend = ({
           blockData={blockData}
         />
         <TableRow modifier="bordered">
+          <TableCell>{t('Order')}</TableCell>
+          <TableCell>
+            <code>{orderId}</code>
+          </TableCell>
+        </TableRow>
+        <TableRow modifier="bordered">
           <TableCell>{t('Market')}</TableCell>
           <TableCell>
             <MarketLink id={marketId} />
